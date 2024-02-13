@@ -1,1 +1,1 @@
-Welkom bij scooby dooby, inshallah broeders welkom bij mijn presentatie. sjinkie knecht. 
+Welkom bij (fo) scoobtiediewoop, inshallah broeders welkom bij mijn presentatie. sjinkie knecht. 
