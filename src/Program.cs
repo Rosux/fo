@@ -4,6 +4,8 @@ class Program
 {
     static void Main(string[] args)
     {
+        Item result = new Item();
+        Console.WriteLine(result.Item);
         Console.WriteLine("Hello, World!");
         Console.ReadKey();
         Console.Clear();

@@ -7,7 +7,8 @@ public class Player
 
     public Player()
     {
-
+        this.Name = "mike";
+        this.Stats = new Stats(100, 12 , 10);
     }
 
 }

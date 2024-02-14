@@ -1,4 +1,9 @@
 public class Dice
 {
-    // generates random number between 1-20 (inclusive)
+    private static Random random = new Random();
+    
+    public static int Roll()
+    {
+        return random.Next(1, 21); 
+    }
 }
