@@ -1,0 +1,61 @@
+ItemType.cs:
+    is an enum for any item (weapon/armor/usable) that indicates what type it is (so we can check later on)
+    
+Weapon.cs:
+    holds the weapon stats like damage, name, worth
+
+Armor.cs:
+    holds the Armor stats like armor, name, worth
+
+Usable.cs:
+    holds the usable stats like effect, ammount, name, worth
+    (like poison, 20dmg, "potion of poison", 200)
+
+Inventory.cs:
+    holds a list of all the items it holds.
+    probably has some methods to check if there is an item in the inventory
+    probably has some method to buy/sell chosen items
+
+Stats.cs:
+    holds the ammount of health, maxHealth, attack-skill, defence-skill and gold
+    (the owner of the gold can be the parent class its used in)
+    has some methods to level-up, heal, take-damage, increase/decrease gold
+
+Quest.cs:
+    holds stuff like questName, questDescription, questTask, completed?
+    has some method to start/complete/fail the quest
+    maybe has some reward thing linked to it
+
+Dialogue.cs:
+    holds a dialogue tree (like a binary tree structure where each node holds multiple choices)
+    has some methods to get the currentNode and to choose an option
+
+Player.cs:
+    holds the name of the player, a Stats instance, a Inventory instance, a list for holding current/ongoing quests
+
+Npc.cs:
+    holds the name of the npc, a Stats instance (if u wanna fight them), a Inventory instance, a list for quests to give to the player, a Dialogue instance
+    has some methods to start dialogue, end dialogue, trade (if they want), fight (if they want)
+
+SubLocation.cs:
+    holds a name of the location and a list of possible npcs/quests
+
+Location.cs:
+    holds a name of the location and a list of SubLocations
+
+World.cs:
+    holds a list of locations and a currentLocation (to track where the player is)
+    has some methods for traveling so you can change the currentLocation
+
+Dice.cs:
+    holds some methods for generating random numbers and calculations to make it easier
+
+Program.cs:
+    holds lists of players/npc's/locations/worlds/and anything we need
+    has methods to print things to the console, to create fights between 2 entities (npc's and players), to trade between 2 entities, to keep track of the position of the player so it knows where they are.
+
+Audio.cs:
+    has some methods to play audio
+
+
+
