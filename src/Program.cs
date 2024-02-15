@@ -11,7 +11,7 @@ class Program
         WriteCenter($"\n\n   ▄████████  ▄██████▄ \n  ███    ███ ███    ███\n  ███    █▀  ███    ███\n ▄███▄▄▄     ███    ███\n▀▀███▀▀▀     ███    ███\n  ███        ███    ███\n  ███        ███    ███\n  ███         ▀██████▀   ");
         Console.ForegroundColor = ConsoleColor.White;
         WriteCenter("\n(GOTY Edition)\n\n");
-        
+        Console.Beep();
     }
 
     static void WriteCenter(string text)
