@@ -4,14 +4,16 @@ class Program
 {
     static void Main(string[] args)
     {
-        // some intro shit
         Console.Clear();
         Console.BackgroundColor = ConsoleColor.Black;
         Console.ForegroundColor = ConsoleColor.DarkRed;
         WriteCenter($"\n\n   ▄████████  ▄██████▄ \n  ███    ███ ███    ███\n  ███    █▀  ███    ███\n ▄███▄▄▄     ███    ███\n▀▀███▀▀▀     ███    ███\n  ███        ███    ███\n  ███        ███    ███\n  ███         ▀██████▀   ");
         Console.ForegroundColor = ConsoleColor.White;
         WriteCenter("\n(GOTY Edition)\n\n");
-        Console.Beep();
+        // Console.Beep();
+        Audio a = new Audio();
+        a.Play(@"Assets\Audio\hihi.wav");
+        Console.ReadKey();
     }
 
     static void WriteCenter(string text)
