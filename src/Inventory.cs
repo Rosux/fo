@@ -1,6 +1,8 @@
+using System.Collections.Generic;
+
 public class Inventory
 {
-    public List<object> Items;
+    public List<Item> Items;
 
     // public int GetArmorStats()
     // {
@@ -13,29 +15,20 @@ public class Inventory
     //     // loop through items. find all weapons. add the damage and return it
     // }
 }
-// public class HelloWorld
+
+// looping through each item example:
+// foreach (Item item in this.Items)
 // {
-//     public static void Main(string[] args)
+//     if (item.Type == ItemType.WEAPON)
 //     {
-//         List<object> items = new List<object>(){new Weapon(), new Armor()};
-        
-//         foreach (var i in items)
-//         {
-//             switch ((i as dynamic).Type)
-//             {
-//                 case ItemType.WEAPON:
-//                     Weapon weapon = (Weapon)i;
-//                     Console.WriteLine(weapon.Name);
-//                     break;
-//                 case ItemType.ARMOR:
-//                     Armor armor = (Armor)i;
-//                     Console.WriteLine(armor.Name);
-//                     break;
-//                 case ItemType.USABLE:
-//                     Armor usable = (Armor)i;
-//                     Console.WriteLine(usable.Name);
-//                     break;
-//             }
-//         }
+//         // do stuff for weapons
+//     }
+//     else if (item.Type == ItemType.ARMOR)
+//     {
+//         // do stuff for armor
+//     }
+//     else if (item.Type == ItemType.USABLE)
+//     {
+//         // do stuff for usable items
 //     }
 // }
