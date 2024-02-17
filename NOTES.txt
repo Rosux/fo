@@ -1,1 +1,3 @@
 traveling between hubs costs gold
+
+player holds ongoing quest and npc checks if its completed
