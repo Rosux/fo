@@ -6,5 +6,9 @@ public class Npc
     public List<Quest> Quests;
     public Dialogue Dialogue;
     
+    public Npc(string Name)
+    {
+        this.Name = Name;
+    }
 
 }
