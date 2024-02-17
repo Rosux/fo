@@ -1,28 +1,8 @@
-public class Node
-{
-    public string Text;
-    public List<Option> Options;
-
-    public Node(string Text, List<Option> Options)
-    {
-        this.Text = Text;
-        this.Options = Options;
-    }
-}
-
-public class Option
-{
-    public string Text;
-    public string NextNode;
-}
-
 public class Dialogue
 {
     public Dictionary<string, Node> Nodes = new Dictionary<string, Node>();
     public Node? CurrentNode = null;
-
     public Dialogue(){}
-    
     
     /// <summary>
     /// Add a node to the dialogue.
@@ -33,6 +13,10 @@ public class Dialogue
     public void AddNode(string Id, string Text, List<Option> Options)
     {
         this.Nodes.Add(Id, new Node(Text, Options));
+        if (this.CurrentNode == null)
+        {
+            this.CurrentNode = this.Nodes[Id];
+        }
     }
 
     /// <summary>
