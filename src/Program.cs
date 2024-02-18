@@ -16,18 +16,20 @@ class Program
         peter.AddNode("1.1", "Bye.", new List<Option>());
         peter.AddNode("1.2", "It's true, I am really peter griffin.", new List<Option>());
 
-        Talk(peter);
+        Talk(peter, "Peter");
+        // Console.Clear();
+        // WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
+        // Console.ReadKey();
     }
 
-    static void Talk(Dialogue dialogueTree)
+    static void Talk(Dialogue dialogueTree, string npcName="")
     {
         int currentChoice = 0;
         while (true)
         {
             Console.Clear();
-            WriteLogo();
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.WriteLine($"{dialogueTree.CurrentNode.Text}");
+            Console.WriteLine($"{npcName}: {dialogueTree.CurrentNode.Text}");
             if (dialogueTree.GetChoices().Count == 0)
             {
                 break;
@@ -92,26 +94,55 @@ class Program
         Console.ForegroundColor = ConsoleColor.White;
         WriteCenter("\n(GOTY Edition)\n\n");
     }
+    
+    static void WriteParchment(string text)
+    {
+        string[] lines = text.Split("\n");
+        int maxLength = lines.OrderByDescending(l=>l.Length).First().Length;
+
+        Console.Write($"/ \\----{new string('-', maxLength)}---, \n");
+        Console.Write($"\\_,|   {new string(' ', maxLength)}   | \n");
+        for (int i = 0; i < lines.Length; i++)
+        {
+            Console.Write($"   |   {lines[i]}{new String(' ', (maxLength-lines[i].Length)+3)}| \n");
+        }
+        Console.Write($"   |  ,{new string('-', maxLength)}----,\n");
+        Console.Write($"   \\_/_{new string('_', maxLength)}___/ \n");
+    }
 }
 
-/*
-      .,-,.\n
-   _-'/   \'-_\n
-_-'  /     \  '-_\n
-|'--|-------|--'|\n
-| / \       / \ |\n
-|/   \ 20  /   \|\n
-/     \   /     \\n
-|------\ /------|\n
- '-._   |   _.-'\n
-     '-.'.-'\n
-*/
+//    ▄████████  ▄██████▄ \n
+//   ███    ███ ███    ███\n
+//   ███    █▀  ███    ███\n
+//  ▄███▄▄▄     ███    ███\n
+// ▀▀███▀▀▀     ███    ███\n
+//   ███        ███    ███\n
+//   ███        ███    ███\n
+//   ███         ▀██████▀ \n
 
-//         ▄████████  ▄██████▄ \n
-//        ███    ███ ███    ███\n
-//        ███    █▀  ███    ███\n
-//       ▄███▄▄▄     ███    ███\n
-//      ▀▀███▀▀▀     ███    ███\n
-//        ███        ███    ███\n
-//        ███        ███    ███\n
-//        ███         ▀██████▀ \n
+//       .,-,.\n
+//    _-'/   \'-_\n
+// _-'  /     \  '-_\n
+// |'--|-------|--'|\n
+// | / \       / \ |\n
+// |/   \ 666 /   \|\n
+// /     \   /     \\n
+// |------\ /------|\n
+//  '-._   |   _.-'\n
+//      '-.'.-'\n
+
+// / \------------------------, \n
+// \_,|                       | \n
+//    |  Travel to the town?  | \n
+//    |  ,---------------------,\n
+//    \_/_____________________/ \n
+
+//        _   _   _           _                      /)_
+//   |\  (_) (_) (_)         (_) /|-----------------/  o\__
+//   |_\__|___|___|___________|_/_|    ____________/ \ ____)
+//    \                          /    /    Horsey   \ /
+//     \   ___            ___   /    / / _________   |
+//      \_/___\__________/___\_/    /_/| | |     | | |
+//        \___/          \___/         |_|_|     |_|_|
+
+// some ending: WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
