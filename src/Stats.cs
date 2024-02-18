@@ -29,6 +29,10 @@ public class Stats
             return true;
         }
     }
+    public void AddGold(int Amount)
+    {
+        Gold = Gold + Amount;
+    }
 
     public bool Damage(int DMG)
     {
@@ -37,6 +41,13 @@ public class Stats
             return false;
         }else{
             return true;
+        }
+    }
+    public void Heal(int Amount)
+    {
+        CurrentHealth = CurrentHealth + Amount;
+        if (CurrentHealth >= MaxHealth){
+            CurrentHealth = MaxHealth;
         }
     }
 }
