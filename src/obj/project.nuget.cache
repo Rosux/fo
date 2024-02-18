@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "TCpGpHaUz5qGYm6vyoxGXcOfzvN3SC4qpu19sjKzIod8aT+j5aKqwR+FThRiF0jYzvBZLhx+V+oYv+s+zUvxsg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\thoma\\OneDrive\\Documenten\\1. HR informatica\\1. HR C#\\fo\\src\\FO.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\thoma\\.nuget\\packages\\system.windows.extensions\\8.0.0\\system.windows.extensions.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
