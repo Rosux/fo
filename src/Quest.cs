@@ -1,14 +1,35 @@
 public class Quest
 {
-    public bool Completed = false;
+    public string QuestName { get; set; }
+    public string QuestDescription { get; set; }
+    public string QuestTask { get; set; }
+    public bool IsCompleted { get; private set; }
+
+    public Quest(string name, string description, string task)
+    {
+        QuestName = name;
+        QuestDescription = description;
+        QuestTask = task;
+        IsCompleted = false;
+    }
+    public void Start()
+    {
+        Console.WriteLine($"Quest started: {QuestName}\n{QuestDescription}");
+        PrintTask();
+    }
 
     public void Complete()
     {
-        // marks the quest as complete
+        IsCompleted = true;
+        Console.WriteLine($"Quest \"{QuestName}\" completed!");
     }
 
-    public void Start()
+    public void PrintTask()
     {
-        // starts tracking the quest
+        Console.WriteLine($"Quest: {QuestTask}");
     }
+
 }
+    // holds stuff like questName, questDescription, questTask, completed?
+    // has some method to start/complete/fail the quest
+    // maybe has some reward thing linked to it
