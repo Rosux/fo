@@ -4,16 +4,19 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.Clear();
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.ForegroundColor = ConsoleColor.DarkRed;
-        WriteCenter($"\n\n   ▄████████  ▄██████▄ \n  ███    ███ ███    ███\n  ███    █▀  ███    ███\n ▄███▄▄▄     ███    ███\n▀▀███▀▀▀     ███    ███\n  ███        ███    ███\n  ███        ███    ███\n  ███         ▀██████▀   ");
-        Console.ForegroundColor = ConsoleColor.White;
-        WriteCenter("\n(GOTY Edition)\n\n");
-        // Console.Beep();
-        Audio a = new Audio();
-        a.Play(@"Assets\Audio\hihi.wav");
-        Console.ReadKey();
+        Weapon weapon = new Weapon(100, "balzak", 20 );
+        Armor armor = new Armor(20, "Shield", 20);
+        Usable usable = new Usable(20, "Protection Potion", 10);
+        // Console.Clear();
+        // Console.BackgroundColor = ConsoleColor.Black;
+        // Console.ForegroundColor = ConsoleColor.DarkRed;
+        // WriteCenter($"\n\n   ▄████████  ▄██████▄ \n  ███    ███ ███    ███\n  ███    █▀  ███    ███\n ▄███▄▄▄     ███    ███\n▀▀███▀▀▀     ███    ███\n  ███        ███    ███\n  ███        ███    ███\n  ███         ▀██████▀   ");
+        // Console.ForegroundColor = ConsoleColor.White;
+        // WriteCenter("\n(GOTY Edition)\n\n");
+        // // Console.Beep();
+        // Audio a = new Audio();
+        // a.Play(@"Assets\Audio\hihi.wav");
+        // Console.ReadKey();
     }
 
     static void WriteCenter(string text)

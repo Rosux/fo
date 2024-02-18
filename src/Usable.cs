@@ -1,8 +1,13 @@
 public class Usable{
-    public ItemType Type;
+    public ItemType Type = ItemType.USABLE;
+    public int Amount;
     public string Name { get; set; }
-    public Usable(){
+    public int Worth;
+
+    public Usable(int Amount, string Name, int Worth){
         this.Type = ItemType.USABLE;
-        this.Name="Potion!";
+        this.Amount = Amount;
+        this.Name= Name;
+        this.Worth = Worth;
     }
 }
