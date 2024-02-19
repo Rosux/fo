@@ -13,10 +13,17 @@ class Program
             new Option("Hi peter...", "1.1"),
             new Option("Not true!", "1.2"),
         });
-        peter.AddNode("1.1", "Bye.", new List<Option>());
-        peter.AddNode("1.2", "It's true, I am really peter griffin.", new List<Option>());
+        peter.AddNode("1.1", "Bye.", new List<Option>(){
+            new Option("...", null, "1")
+        });
+        peter.AddNode("1.2", "It's true, I am really peter griffin.", new List<Option>(){
+            new Option("...", null, "1")
+        });
 
         Talk(peter, "Peter");
+        // Console.WriteLine("hmmmm puase");
+        // Console.ReadKey();
+        // Talk(peter, "Peter");
         // Console.Clear();
         // WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
         // Console.ReadKey();
@@ -25,44 +32,48 @@ class Program
     static void Talk(Dialogue dialogueTree, string npcName="")
     {
         int currentChoice = 0;
-        while (true)
+        // weird internal method since i cant do `break 2;`
+        void printingLoop()
         {
-            Console.Clear();
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.WriteLine($"{npcName}: {dialogueTree.CurrentNode.Text}");
-            if (dialogueTree.GetChoices().Count == 0)
+            while (true)
             {
-                break;
-            }
-            // print options
-            foreach (KeyValuePair<int, string> text in dialogueTree.GetChoices())
-            {
-                if (text.Key == currentChoice) { Console.BackgroundColor = ConsoleColor.DarkGray; }
-                Console.WriteLine($">{text.Key+1}: {text.Value}");
+                Console.Clear();
                 Console.BackgroundColor = ConsoleColor.Black;
+                Console.WriteLine($"{npcName}: {dialogueTree.CurrentNode.Text}");
+                // print options
+                foreach (KeyValuePair<int, string> text in dialogueTree.GetChoices())
+                {
+                    if (text.Key == currentChoice) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    Console.WriteLine($">{text.Key+1}: {text.Value}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+                // choose option by pressing up/down/enter
+                ConsoleKey key;
+                do
+                {
+                    key = Console.ReadKey(true).Key;
+                    if (key == ConsoleKey.UpArrow)
+                    {
+                        currentChoice--;
+                    }
+                    else if (key == ConsoleKey.DownArrow)
+                    {
+                        currentChoice++;
+                    }
+                    else if (key == ConsoleKey.Enter)
+                    {
+                        currentChoice = 0;
+                        if (dialogueTree.Step(currentChoice))
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    currentChoice = Math.Clamp(currentChoice, 0, Math.Max(0, dialogueTree.GetChoices().Count-1));
+                } while (key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow && key != ConsoleKey.Enter && dialogueTree.GetChoices().Count > 0);
             }
-
-            ConsoleKey key;
-            do
-            {
-                key = Console.ReadKey(true).Key;
-                if (key == ConsoleKey.UpArrow)
-                {
-                    currentChoice--;
-                }
-                else if (key == ConsoleKey.DownArrow)
-                {
-                    currentChoice++;
-                }
-                else if (key == ConsoleKey.Enter)
-                {
-                    dialogueTree.Step(currentChoice);
-                    currentChoice = 0;
-                    break;
-                }
-                currentChoice = Math.Clamp(currentChoice, 0, dialogueTree.GetChoices().Count-1);
-            } while (key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow && key != ConsoleKey.Enter);
         }
+        printingLoop();
         WriteCenter("Press any key to continue...");
         Console.ReadKey(true);
     }

@@ -23,19 +23,27 @@ public class Dialogue
     /// Step to the next option.
     /// </summary>
     /// <param name="Choice">The index of the choice.</param>
-    public void Step(int Choice)
+    /// return true=stop false=keep going
+    public bool Step(int Choice)
     {
         if (CurrentNode.Options.Count == 0)
         {
             // there is no next option
-            return;
+            return true;
         }
-        if (Choice < 0 || Choice >= CurrentNode.Options.Count) { return; }
+        if (Choice < 0 || Choice >= CurrentNode.Options.Count) { return false; }
         string NextNodeId = CurrentNode.Options[Choice].NextNode;
-        if (Nodes.ContainsKey(NextNodeId))
+        if (CurrentNode.Options[Choice].ResetNode != null && Nodes.ContainsKey(CurrentNode.Options[Choice].ResetNode))
+        {
+            this.CurrentNode = Nodes[CurrentNode.Options[Choice].ResetNode];
+            Console.WriteLine("resseting node...");
+            return true;
+        }
+        else if (Nodes.ContainsKey(NextNodeId))
         {
             this.CurrentNode = Nodes[NextNodeId];
         }
+        return false;
     }
 
     /// <summary>
