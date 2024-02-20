@@ -2,35 +2,46 @@
 
 class Program
 {
+    private static List<Npc> GameNpcs = new List<Npc>();
+    
     static void Main(string[] args)
     {
+        CreateNpc();
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
         WriteLogo();
+        Console.WriteLine("Press ENTER to start.");
+        ConsoleKey key;
+        do
+        {
+            key = Console.ReadKey(true).Key;
+        } while (key != ConsoleKey.Enter);
 
-        Dialogue peter = new Dialogue();
-        peter.AddNode("1", "Hey! I'm peter griffin.", new List<Option>(){
-            new Option("Hi peter...", "1.1"),
-            new Option("Not true!", "1.2"),
-        });
-        peter.AddNode("1.1", "Bye.", new List<Option>(){
-            new Option("...", null, "1")
-        });
-        peter.AddNode("1.2", "It's true, I am really peter griffin.", new List<Option>(){
-            new Option("...", null, "1")
-        });
-
-        Talk(peter, "Peter");
-        // Console.WriteLine("hmmmm puase");
-        // Console.ReadKey();
-        // Talk(peter, "Peter");
-        // Console.Clear();
-        // WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
-        // Console.ReadKey();
+        Talk(GameNpcs[0]);
     }
 
-    static void Talk(Dialogue dialogueTree, string npcName="")
+    static void CreateNpc()
     {
+        Dialogue peterDialogue = new Dialogue();
+        peterDialogue.AddNode("1", "Hey! I'm peter griffin.\nHihihi.", new List<Option>(){
+            new Option("Hi peter...\nhow are u?", "1.1"),
+            new Option("Not true!", "1.2"),
+        });
+        peterDialogue.AddNode("1.1", "Bye.", new List<Option>(){
+            new Option("...", null, "1")
+        });
+        peterDialogue.AddNode("1.2", "It's true, I am really peter griffin.", new List<Option>(){
+            new Option("...", null, "1")
+        });
+        GameNpcs.Add(
+            new Npc("Peter Griffin", peterDialogue)
+        );
+    }
+
+    static void Talk(Npc npc)
+    {
+        Dialogue dialogueTree = npc.Dialogue;
+        string npcName = npc.Name;
         int currentChoice = 0;
         // weird internal method since i cant do `break 2;`
         void printingLoop()
@@ -39,14 +50,44 @@ class Program
             {
                 Console.Clear();
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.WriteLine($"{npcName}: {dialogueTree.CurrentNode.Text}");
+                // calculate longest line to make box responsive
+                int longestLine = npcName.Length;
+                int maxTextLength = dialogueTree.CurrentNode.Text.Split('\n').OrderByDescending(l=>l.Length).First().Length;
+                if (maxTextLength > longestLine) { longestLine = maxTextLength; }
+                foreach (KeyValuePair<int, string> text in dialogueTree.GetChoices())
+                {
+                    string[] lines = text.Value.Split('\n');
+                    int maxLength = lines.OrderByDescending(l=>l.Length).First().Length;
+                    if (maxLength+4 > longestLine) { longestLine = maxLength+4; }
+                }
+                // print npc name and text
+                Console.Write($"┌─{npcName}{new string('─', longestLine-npcName.Length)}─┐\n");
+                string[] textLines = dialogueTree.CurrentNode.Text.Split('\n');
+                for (int i = 0; i < textLines.Length; i++)
+                {
+                    Console.Write($"│ {textLines[i]}{new string(' ', Math.Max(0, longestLine-textLines[i].Length))} │\n");
+                }
+                Console.Write($"├─{new string('─', longestLine)}─┤\n");
                 // print options
                 foreach (KeyValuePair<int, string> text in dialogueTree.GetChoices())
                 {
-                    if (text.Key == currentChoice) { Console.BackgroundColor = ConsoleColor.DarkGray; }
-                    Console.WriteLine($">{text.Key+1}: {text.Value}");
-                    Console.BackgroundColor = ConsoleColor.Black;
+                    string[] lines = text.Value.Split('\n');
+                    for (int i = 0; i < lines.Length; i++){
+                        Console.Write("│ ");
+                        if (text.Key == currentChoice) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+                        if (i == 0)
+                        {
+                            Console.Write($">{text.Key+1}: {lines[i]}{new string(' ', Math.Max(0, longestLine-lines[i].Length-4))}");
+                        }
+                        else
+                        {
+                            Console.Write($"{lines[i]}{new string(' ', Math.Max(0, longestLine-lines[i].Length))}");
+                        }
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write(" │\n");
+                    }
                 }
+                Console.Write($"└─{new string('─', longestLine)}─┘\n");
                 // choose option by pressing up/down/enter
                 ConsoleKey key;
                 do
@@ -62,11 +103,11 @@ class Program
                     }
                     else if (key == ConsoleKey.Enter)
                     {
-                        currentChoice = 0;
                         if (dialogueTree.Step(currentChoice))
                         {
                             return;
                         }
+                        currentChoice = 0;
                         break;
                     }
                     currentChoice = Math.Clamp(currentChoice, 0, Math.Max(0, dialogueTree.GetChoices().Count-1));
@@ -74,8 +115,6 @@ class Program
             }
         }
         printingLoop();
-        WriteCenter("Press any key to continue...");
-        Console.ReadKey(true);
     }
 
     static void WriteCenter(string text)
@@ -142,6 +181,8 @@ class Program
 //  '-._   |   _.-'\n
 //      '-.'.-'\n
 
+// some ending: WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
+
 // / \------------------------, \n
 // \_,|                       | \n
 //    |  Travel to the town?  | \n
@@ -156,4 +197,9 @@ class Program
 //      \_/___\__________/___\_/    /_/| | |     | | |
 //        \___/          \___/         |_|_|     |_|_|
 
-// some ending: WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
+// ┌─npc name────┐\n
+// │ npc text    │\n
+// ├─────────────┤\n
+// │ >1: option1 │\n
+// │ >1: option2 │\n
+// └─────────────┘\n

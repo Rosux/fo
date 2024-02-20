@@ -36,7 +36,6 @@ public class Dialogue
         if (CurrentNode.Options[Choice].ResetNode != null && Nodes.ContainsKey(CurrentNode.Options[Choice].ResetNode))
         {
             this.CurrentNode = Nodes[CurrentNode.Options[Choice].ResetNode];
-            Console.WriteLine("resseting node...");
             return true;
         }
         else if (Nodes.ContainsKey(NextNodeId))
