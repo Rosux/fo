@@ -1,3 +1,20 @@
 traveling between hubs costs gold
 
 player holds ongoing quest and npc checks if its completed
+
+
+enum questtypes
+fetch
+kill
+
+enum killType
+goblin
+dwarf
+human
+
+enum fetchType
+weapon
+armor
+usable
+
+
