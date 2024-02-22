@@ -10,26 +10,36 @@ class Program
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
         WriteLogo();
-        Console.WriteLine("Press ENTER to start.");
-        ConsoleKey key;
-        do
-        {
-            key = Console.ReadKey(true).Key;
-        } while (key != ConsoleKey.Enter);
+        // Console.WriteLine("Press ENTER to start.");
+        // ConsoleKey key;
+        // do
+        // {
+        //     key = Console.ReadKey(true).Key;
+        // } while (key != ConsoleKey.Enter);
 
+        Player p = new Player();
+        Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true);
+
+        p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
+        p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
+        john.Inventory.Add(new Weapon(0, "Stone Sword", 10));
+
+        Trade(p, john);
+
+        // Console.WriteLine($"{p.Name} {p.Stats.Gold}");
         // Talk(GameNpcs[0]);
-        Stats s = new Stats(0, 0, 0, 0, 0);
-        Inventory inv = new Inventory(new List<object>(){
-            new Armor(20, "", 10),
-            new Weapon(20, "", 10)
-        });
-        Console.WriteLine(inv.Items.Count);
-        inv.Add(new Usable(0, "", 100));
-        Console.WriteLine(inv.Items.Count);
-        Console.WriteLine(inv.GetWeaponDamage());
-        Console.WriteLine(inv.GetArmorPoints());
-        inv.Sell(2, s);
-        Console.WriteLine(s.Gold);
+        // Stats s = new Stats(0, 0, 0, 0, 0);
+        // Inventory inv = new Inventory(new List<object>(){
+        //     new Armor(20, "", 10),
+        //     new Weapon(20, "", 10)
+        // });
+        // Console.WriteLine(inv.Items.Count);
+        // inv.Add(new Usable(0, "", 100));
+        // Console.WriteLine(inv.Items.Count);
+        // Console.WriteLine(inv.GetWeaponDamage());
+        // Console.WriteLine(inv.GetArmorPoints());
+        // inv.Sell(2, s);
+        // Console.WriteLine(s.Gold);
     }
 
     static void CreateNpc()
@@ -46,12 +56,54 @@ class Program
             new Option("...", null, "1")
         });
         GameNpcs.Add(
-            new Npc("Peter Griffin", new Inventory(), new Stats(), new List<Quest>(), peterDialogue)
+            new Npc("Peter Griffin", NpcType.HUMAN, new Stats(), new Inventory(), false, new List<Quest>(), peterDialogue)
         );
+    }
+
+    static void WriteCenter(string text)
+    {
+        // split text at lines
+        string[] lines = text.Split('\n');
+
+        // find longest line
+        int maxLength = lines.OrderByDescending(l=>l.Length).First().Length;
+
+        // Calculate left padding for each line
+        int screenWidth = Console.WindowWidth;
+        foreach (string line in lines)
+        {
+            int padding = Math.Max((screenWidth - maxLength) / 2, 0);
+            Console.Write(new string(' ', padding));
+            Console.WriteLine(line);
+        }
+    }
+
+    static void WriteLogo()
+    {
+        Console.Clear();
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        WriteCenter($"\n\n   ▄████████  ▄██████▄ \n  ███    ███ ███    ███\n  ███    █▀  ███    ███\n ▄███▄▄▄     ███    ███\n▀▀███▀▀▀     ███    ███\n  ███        ███    ███\n  ███        ███    ███\n  ███         ▀██████▀   ");
+        Console.ForegroundColor = ConsoleColor.White;
+        WriteCenter("\n(GOTY Edition)\n\n");
+    }
+    
+    static void WriteParchment(string text)
+    {
+        string[] lines = text.Split("\n");
+        int maxLength = lines.OrderByDescending(l=>l.Length).First().Length;
+
+        Console.Write($"/ \\----{new string('-', maxLength)}---, \n\\_,|   {new string(' ', maxLength)}   | \n");
+        for (int i = 0; i < lines.Length; i++)
+        {
+            Console.Write($"   |   {lines[i]}{new String(' ', (maxLength-lines[i].Length)+3)}| \n");
+        }
+        Console.Write($"   |  ,{new string('-', maxLength)}----,\n   \\_/_{new string('_', maxLength)}___/ \n");
     }
 
     static void Talk(Npc npc)
     {
+        if (!npc.CanTalk){ return; }
         Dialogue dialogueTree = npc.Dialogue;
         string npcName = npc.Name;
         int currentChoice = 0;
@@ -129,51 +181,9 @@ class Program
         printingLoop();
     }
 
-    static void WriteCenter(string text)
+    static void Fight(Player player, Npc npc)
     {
-        // split text at lines
-        string[] lines = text.Split('\n');
-
-        // find longest line
-        int maxLength = lines.OrderByDescending(l=>l.Length).First().Length;
-
-        // Calculate left padding for each line
-        int screenWidth = Console.WindowWidth;
-        foreach (string line in lines)
-        {
-            int padding = Math.Max((screenWidth - maxLength) / 2, 0);
-            Console.Write(new string(' ', padding));
-            Console.WriteLine(line);
-        }
-    }
-
-    static void WriteLogo()
-    {
-        Console.Clear();
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.ForegroundColor = ConsoleColor.DarkRed;
-        WriteCenter($"\n\n   ▄████████  ▄██████▄ \n  ███    ███ ███    ███\n  ███    █▀  ███    ███\n ▄███▄▄▄     ███    ███\n▀▀███▀▀▀     ███    ███\n  ███        ███    ███\n  ███        ███    ███\n  ███         ▀██████▀   ");
-        Console.ForegroundColor = ConsoleColor.White;
-        WriteCenter("\n(GOTY Edition)\n\n");
-    }
-    
-    static void WriteParchment(string text)
-    {
-        string[] lines = text.Split("\n");
-        int maxLength = lines.OrderByDescending(l=>l.Length).First().Length;
-
-        Console.Write($"/ \\----{new string('-', maxLength)}---, \n");
-        Console.Write($"\\_,|   {new string(' ', maxLength)}   | \n");
-        for (int i = 0; i < lines.Length; i++)
-        {
-            Console.Write($"   |   {lines[i]}{new String(' ', (maxLength-lines[i].Length)+3)}| \n");
-        }
-        Console.Write($"   |  ,{new string('-', maxLength)}----,\n");
-        Console.Write($"   \\_/_{new string('_', maxLength)}___/ \n");
-    }
-
-    static void Combat(Player player, Npc npc)
-    {
+        if (!npc.CanFight) { return; }
         while (player.Stats.CurrentHealth > 0  && npc.Stats.CurrentHealth > 0)
         {
             Console.WriteLine($"{player.Name} vs  {npc.Name}");
@@ -215,7 +225,58 @@ class Program
             Console.WriteLine("game over!");
         }
     }
+
+    static void Trade(Player player, Npc npc)
+    {
+        if (!npc.CanTrade) { return; }
+        int currentChoice = 0;
+        bool sell = true;
+        int longestPlayerString = (player.Name.Length > player.Inventory.GetLongestName()) ? player.Name.Length : player.Inventory.GetLongestName();
+        int longestNpcString = (npc.Name.Length+8 > npc.Inventory.GetLongestName()) ? npc.Name.Length+8 : npc.Inventory.GetLongestName();
+
+        // write loop
+        while (true)
+        {
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            string arrow = (sell) ? "->" : "<-";
+            Console.Write($"┌─Your Items{new string('─', Math.Max(0, longestPlayerString-10))}─┬─Gold─┐ {arrow} ┌─{npc.Name}'s Items{new string('─', Math.Max(0, (longestNpcString-npc.Name.Length)-8))}─┬─Gold─┐\n");
+            
+            for (int i = 0; i < Math.Max(npc.Inventory.Items.Count, player.Inventory.Items.Count); i++)
+            {
+                Console.WriteLine(i);
+            }
+
+            string playerItemName = ((Weapon)player.Inventory.Items[0]).Name;
+            int playerItemValue = ((Weapon)player.Inventory.Items[0]).Worth;
+            string playerItem = $"│ {playerItemName}{new string(' ', longestPlayerString-playerItemName.Length)} │ {playerItemValue,4} │";
+
+            string npcItemName = ((Weapon)npc.Inventory.Items[0]).Name;
+            int npcItemValue = ((Weapon)npc.Inventory.Items[0]).Worth;
+            string npcItem = $"│ {npcItemName}{new string(' ', longestNpcString-npcItemName.Length)} │ {npcItemValue,4} │";
+
+            Console.Write($"{playerItem}    {npcItem}");
+            ConsoleKey key;
+            do{
+                key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.LeftArrow)
+                {
+                    sell = true;
+                }
+                if (key == ConsoleKey.RightArrow)
+                {
+                    sell = false;
+                }
+            } while (key != ConsoleKey.Enter && key != ConsoleKey.LeftArrow && key != ConsoleKey.RightArrow && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow);
+        }
+    }
 }
+
+// ┌─Your Items────────┬─Gold─┐ <- ┌─John's Items─────┬─Gold─┐
+// │ Sword             │    1 │    │ Buying this item │    1 │
+// │ Helmet            │   13 │    │ Iron Chestplate  │   13 │
+// │ Potion of healing │   13 │    └──────────────────┴──────┘
+// └───────────────────┴──────┘
 
 //    ▄████████  ▄██████▄ \n
 //   ███    ███ ███    ███\n
