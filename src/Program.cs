@@ -17,7 +17,19 @@ class Program
             key = Console.ReadKey(true).Key;
         } while (key != ConsoleKey.Enter);
 
-        Talk(GameNpcs[0]);
+        // Talk(GameNpcs[0]);
+        Stats s = new Stats(0, 0, 0, 0, 0);
+        Inventory inv = new Inventory(new List<object>(){
+            new Armor(20, "", 10),
+            new Weapon(20, "", 10)
+        });
+        Console.WriteLine(inv.Items.Count);
+        inv.Add(new Usable(0, "", 100));
+        Console.WriteLine(inv.Items.Count);
+        Console.WriteLine(inv.GetWeaponDamage());
+        Console.WriteLine(inv.GetArmorPoints());
+        inv.Sell(2, s);
+        Console.WriteLine(s.Gold);
     }
 
     static void CreateNpc()
