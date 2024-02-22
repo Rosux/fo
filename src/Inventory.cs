@@ -111,6 +111,35 @@ public class Inventory
         }
         return false;
     }
+
+    public int GetLongestName()
+    {
+        int longest = -1;
+        foreach (var i in this.Items)
+        {
+            string name = "";
+            switch ((i as dynamic).Type)
+            {
+                case ItemType.WEAPON:
+                    Weapon weapon = (Weapon)i;
+                    name = weapon.Name;
+                    break;
+                case ItemType.ARMOR:
+                    Armor armor = (Armor)i;
+                    name = armor.Name;
+                    break;
+                case ItemType.USABLE:
+                    Usable usable = (Usable)i;
+                    name = usable.Name;
+                    break;
+            }
+            if (name.Length > longest)
+            {
+                longest = name.Length;
+            }
+        }
+        return longest;
+    }
 }
 
 // public class HelloWorld
@@ -132,7 +161,7 @@ public class Inventory
 //                     Console.WriteLine(armor.Name);
 //                     break;
 //                 case ItemType.USABLE:
-//                     Armor usable = (Armor)i;
+//                     Usable usable = (Usable)i;
 //                     Console.WriteLine(usable.Name);
 //                     break;
 //             }
