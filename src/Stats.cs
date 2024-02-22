@@ -8,7 +8,7 @@ public class Stats
     public int Defence; // your skill in defending
     public int Gold; // characters current gold // field
 
-    public Stats(int CurrentHealth, int MaxHealth, int Attack, int Defence, int Gold) // constructor
+    public Stats(int CurrentHealth = 0, int MaxHealth = 0, int Attack = 0, int Defence = 0, int Gold = 0) // constructor
     {
         this.CurrentHealth = CurrentHealth;
         this.MaxHealth = MaxHealth;

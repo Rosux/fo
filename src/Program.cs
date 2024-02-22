@@ -34,7 +34,7 @@ class Program
             new Option("...", null, "1")
         });
         GameNpcs.Add(
-            new Npc("Peter Griffin", peterDialogue)
+            new Npc("Peter Griffin", new Inventory(), new Stats(), new List<Quest>(), peterDialogue)
         );
     }
 
@@ -159,7 +159,7 @@ class Program
         Console.Write($"   |  ,{new string('-', maxLength)}----,\n");
         Console.Write($"   \\_/_{new string('_', maxLength)}___/ \n");
     }
-    
+
     static void Combat(Player player, Npc npc)
     {
         while (player.Stats.CurrentHealth > 0  && npc.Stats.CurrentHealth > 0)
