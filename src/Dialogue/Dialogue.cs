@@ -33,6 +33,7 @@ public class Dialogue
         }
         if (Choice < 0 || Choice >= CurrentNode.Options.Count) { return false; }
         string NextNodeId = CurrentNode.Options[Choice].NextNode;
+        if (CurrentNode.Options[Choice].Callback != null) { CurrentNode.Options[Choice].Callback(); }
         if (CurrentNode.Options[Choice].ResetNode != null && Nodes.ContainsKey(CurrentNode.Options[Choice].ResetNode))
         {
             this.CurrentNode = Nodes[CurrentNode.Options[Choice].ResetNode];
