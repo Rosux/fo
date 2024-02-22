@@ -5,10 +5,12 @@ public class Player
     public Stats Stats;
     public List<Quest> OngoingQuests;
 
-    public Player()
+    public Player(string Name, Inventory Inventory,Stats Stats, List<Quest> OngoingQuests)
     {
-        this.Name = "mike";
-        this.Stats = new Stats(100, 12 , 10);
+        this.Name = Name;
+        this.Inventory = Inventory;
+        this.Stats = Stats;
+        this.OngoingQuests = OngoingQuests;
     }
 
 }

@@ -159,6 +159,50 @@ class Program
         Console.Write($"   |  ,{new string('-', maxLength)}----,\n");
         Console.Write($"   \\_/_{new string('_', maxLength)}___/ \n");
     }
+    
+    static void Combat(Player player, Npc npc)
+    {
+        while (player.Stats.CurrentHealth > 0  && npc.Stats.CurrentHealth > 0)
+        {
+            Console.WriteLine($"{player.Name} vs  {npc.Name}");
+            Console.WriteLine($"enter A to attack or H to heal");
+            int turn = 1;
+            while (turn == 1 && player.Stats.CurrentHealth > 0){
+            string Choice = Console.ReadLine();
+                if (Choice == "a" || Choice == "A")
+                {
+                    int Roll = Dice.Roll();
+                    npc.Stats.Damage(Roll);
+                    Console.WriteLine($"{player.Name} did {Roll} dmg and {npc.Name} has {npc.Stats.CurrentHealth} HP left");
+                    turn = 2;
+                }
+                else if (Choice == "h" || Choice == "H")
+                {
+                    int Roll = Dice.Roll();
+                    player.Stats.Heal(Roll);
+                    Console.WriteLine($"{player.Name} has healed {Roll} HP you have {player.Stats.CurrentHealth} HP left");
+                    turn = 2;
+                }
+                else
+                {
+                    Console.WriteLine("wrong input try again");
+                }
+            }
+            if (turn == 2 && npc.Stats.CurrentHealth > 0)
+            {
+                int Roll = Dice.Roll();
+                player.Stats.Damage(Roll);
+                Console.WriteLine($"{npc.Name} did {Roll} dmg and {player.Name} has {player.Stats.CurrentHealth} HP left");
+                turn = 1;
+            }
+        }
+        if (npc.Stats.CurrentHealth <= 0)
+        {
+            Console.WriteLine("you won good job!");
+        }else{
+            Console.WriteLine("game over!");
+        }
+    }
 }
 
 //    ▄████████  ▄██████▄ \n
