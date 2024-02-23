@@ -17,9 +17,4 @@ public class Player
     {
         quest.Start(this);
     }
-
-    public void UpdateQuests()
-    {
-        Quest.UpdateQuests(this);
-    }
 }

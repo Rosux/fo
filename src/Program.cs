@@ -21,16 +21,15 @@ class Program
         Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true);
 
 
-        Quest quest1 = new Quest("kill the goblin", QuestType.KILL, KillType.GOBLIN,  ItemType.None, 3, 3 );
-        Quest quest2 = new Quest("kill the Monkey", QuestType.KILL, KillType.GOBLIN,  ItemType.None, 3, 3 );
+        Quest quest1 = new Quest("kill the goblin", QuestType.KILL, KillType.GOBLIN, 3);
+        Quest quest2 = new Quest("kill the Monkey", QuestType.FETCH, ItemType.ARMOR, "holy armor", john);
 
         p.StartQuest(quest1);
         p.StartQuest(quest2);
         for(int i=0;i<p.OngoingQuests.Count;i++)
         {
-        Console.WriteLine(p.OngoingQuests[i]);
+            Console.WriteLine(p.OngoingQuests[i].Name);
         }
-        p.UpdateQuests();
 
         // p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
         // p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
@@ -332,3 +331,17 @@ class Program
 // │ >1: option1 │\n
 // │ >1: option2 │\n
 // └─────────────┘\n
+
+
+//[ goblins ]=-  6/97
+//             ,      ,
+//            /(.-""-.)\
+//        |\  \/      \/  /|
+//        | \ / =.  .= \ / |
+//        \( \   o\/o   / )/
+//         \_, '-/  \-' ,_/
+//           /   \__/   \
+//           \ \__/\__/ /
+//         ___\ \|--|/ /___
+//       /`    \      /    `\
+//  jgs /       '----'       \

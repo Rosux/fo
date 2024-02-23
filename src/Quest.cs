@@ -5,21 +5,33 @@ public class Quest
     public QuestType QuestType;
     public KillType KillType;
     public ItemType ItemType;
-    public int Amount;
-    public int AmountQuest;
+    public int RequiredKillAmount;
+    public string ItemName;
+    public int CurrentKills;
+    public Npc Npc;
 
-    public Quest(string Name, QuestType QuestType, KillType KillType, ItemType ItemType,int Amount, int AmountQuest)
+
+    public Quest(string Name, QuestType QuestType, ItemType ItemType, string ItemName, Npc Npc)
+    {
+        this.Name = Name;
+        this.QuestType = QuestType;
+        this.ItemType = ItemType;
+        this.ItemName = ItemName;
+        this.Npc = Npc;
+    }
+
+    public Quest(string Name, QuestType QuestType, KillType KillType, int RequiredKillAmount)
     {
         this.Name = Name;
         this.QuestType = QuestType;
         this.KillType = KillType;
-        this.ItemType = ItemType;
-        this.Amount = Amount;
-        this.AmountQuest = AmountQuest;
+        this.RequiredKillAmount = RequiredKillAmount;
+        this.CurrentKills = 0;
     }
 
-    public void Complete()
+    public void Complete(Player player)
     {
+        player.OngoingQuests.Remove(this);
     }
 
     public void Start(Player player)
@@ -28,35 +40,12 @@ public class Quest
         player.OngoingQuests.Add(this); 
     }
 
-    public static void UpdateQuests(Player player)
+    public bool CheckCompletion()
     {
-        for (int i = player.OngoingQuests.Count - 1; i >= 0; i--)
-        {
-            Quest quest = player.OngoingQuests[i];
-
-            if (!quest.Completed)
-            {
-                bool completed = CheckCompletion(quest, player);
-
-                if (completed)
-                {
-                    quest.Completed = true;
-                    Console.WriteLine($"Quest '{quest.Name}' completed for player '{player.Name}'.");
-                    player.OngoingQuests.RemoveAt(i);
-                }
-            }
-        }
-}
-    private static bool CheckCompletion(Quest quest, Player player)
-    {
-        if (quest.Amount == quest.AmountQuest)
-        {
-            return true; 
-        }
-        else
-        {
-            return false; 
+        if (this.QuestType == QuestType.FETCH){
+            return this.Npc.Inventory.HasItem(this.ItemName);
+        }else{
+            return CurrentKills >= RequiredKillAmount;
         }
     }
-
 }

@@ -14,6 +14,37 @@ public class Inventory
         }
     }
 
+    public bool HasItem(string Item){
+        foreach (var i in this.Items)
+        {
+            switch ((i as dynamic).Type)
+            {
+                case ItemType.WEAPON:
+                    Weapon weapon = (Weapon)i;
+                    if (weapon.Name == Item)
+                    {
+                        return true;
+                    }
+                    break;
+                case ItemType.ARMOR:
+                    Armor armor = (Armor)i;
+                    if (armor.Name == Item)
+                    {
+                        return true;
+                    }
+                    break;
+                case ItemType.USABLE:
+                    Usable usable = (Usable)i;
+                    if (usable.Name == Item)
+                    {
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return false;
+    }
+
     public void Sell(int Index, Stats stats)
     {
         if (Index < 0 || Index >= this.Items.Count){ return; }
