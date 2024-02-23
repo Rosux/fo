@@ -15,9 +15,16 @@ class Program
         // Audio a = new Audio();
         // a.Play(@"Assets\Audio\hihi.wav");
         // Console.ReadKey();
-        Locations();
+        
+        List<Location> locations = InitializeLocations();
+        World myWorld = new World(locations);
+        Stats playerStats = new Stats(CurrentHealth: 100, MaxHealth: 100, Attack: 20, Defence: 10, Gold: 100);
+        myWorld.PrintAllLocations();
+        myWorld.Travel(myWorld.Locations[1], playerStats);
+        Console.WriteLine($"Current Location: {myWorld.CurrentLocation.Name}");
+        Console.WriteLine($"Remaining Gold: {playerStats.Gold}");
     }
-    static void Locations()
+    static List<Location> InitializeLocations()
     {   
         // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
         SubLocation Bar = new SubLocation("Bar", new List<Npc>());
@@ -27,7 +34,7 @@ class Program
         SubLocation Hospital = new SubLocation("Hospital", new List<Npc>()); 
 
         Location Town = new Location("Town", new List<SubLocation>{Bar, Fountain, Town_Square, Shop, Hospital}, 20);
-        Console.WriteLine(Town);
+        // Console.WriteLine(Town);
 
         // Location Castle SubLocations: Treasury, Throne Room, Dungeon
         SubLocation Treasury = new SubLocation("Treasury", new List<Npc>());
@@ -35,14 +42,14 @@ class Program
         SubLocation Dungeon = new SubLocation("Dungeon", new List<Npc>());
 
         Location Castle = new Location("Castle", new List<SubLocation>{Treasury, Throne_Room, Dungeon}, 40);
-        Console.WriteLine(Castle);
+        // Console.WriteLine(Castle);
 
         // Location: Mountain SubLocations: Cave, Vulcano
         SubLocation Cave = new SubLocation("Cave", new List<Npc>());
         SubLocation Vulcano = new SubLocation("Vulcano", new List<Npc>());
 
         Location Mountain = new Location("Mountain", new List<SubLocation>{Cave, Vulcano}, 60);
-        Console.WriteLine(Mountain);
+        // Console.WriteLine(Mountain);
 
         // Location: Farm SubLocations: River, Woods, Farmhouse
         SubLocation River = new SubLocation("River", new List<Npc>());
@@ -50,7 +57,8 @@ class Program
         SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>());
 
         Location Farm = new Location("Farm", new List<SubLocation>{River, Woods, Farmhouse}, 80);
-        Console.WriteLine(Farm);
+        // Console.WriteLine(Farm);
+        return new List<Location> { Town, Castle, Mountain, Farm };
     }
     static void WriteCenter(string text)
     {
