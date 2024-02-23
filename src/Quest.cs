@@ -6,16 +6,16 @@ public class Quest
     public KillType KillType;
     public ItemType ItemType;
     public int Amount;
-    public int Kills;
+    public int AmountQuest;
 
-    public Quest(string Name, QuestType QuestType, KillType KillType, ItemType ItemType,int Amount, int Kills)
+    public Quest(string Name, QuestType QuestType, KillType KillType, ItemType ItemType,int Amount, int AmountQuest)
     {
         this.Name = Name;
         this.QuestType = QuestType;
         this.KillType = KillType;
         this.ItemType = ItemType;
         this.Amount = Amount;
-        this.Kills = Kills;
+        this.AmountQuest = AmountQuest;
     }
 
     public void Complete()
@@ -30,8 +30,10 @@ public class Quest
 
     public static void UpdateQuests(Player player)
     {
-        foreach (Quest quest in player.OngoingQuests)
+        for (int i = player.OngoingQuests.Count - 1; i >= 0; i--)
         {
+            Quest quest = player.OngoingQuests[i];
+
             if (!quest.Completed)
             {
                 bool completed = CheckCompletion(quest, player);
@@ -40,15 +42,14 @@ public class Quest
                 {
                     quest.Completed = true;
                     Console.WriteLine($"Quest '{quest.Name}' completed for player '{player.Name}'.");
-                    player.OngoingQuests.Remove(quest);
+                    player.OngoingQuests.RemoveAt(i);
                 }
             }
         }
-    }
+}
     private static bool CheckCompletion(Quest quest, Player player)
     {
-        Console.WriteLine($"{quest.Amount}, {quest.Kills}");
-        if (quest.Amount == quest.Kills)
+        if (quest.Amount == quest.AmountQuest)
         {
             return true; 
         }
@@ -57,4 +58,5 @@ public class Quest
             return false; 
         }
     }
+
 }
