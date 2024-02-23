@@ -19,6 +19,12 @@ public class Dialogue
         }
     }
 
+    public void AddOption(string NodeId, Option option)
+    {
+        if (!this.Nodes.ContainsKey(NodeId)) { return; }
+        this.Nodes[NodeId].Options.Add(option);
+    }
+
     /// <summary>
     /// Step to the next option.
     /// </summary>
