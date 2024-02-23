@@ -5,12 +5,11 @@ public class Player
     public Stats Stats;
     public List<Quest> OngoingQuests;
 
-    public Player(string Name, Inventory Inventory,Stats Stats, List<Quest> OngoingQuests)
+    public Player(string Name = "Player", Stats Stats = null, Inventory Inventory = null, List<Quest> Quests = null)
     {
         this.Name = Name;
-        this.Inventory = Inventory;
-        this.Stats = Stats;
-        this.OngoingQuests = OngoingQuests;
+        this.Stats = (Stats == null) ? new Stats() : Stats;
+        this.Inventory = (Inventory == null) ? new Inventory() : Inventory;
+        this.OngoingQuests = (Quests == null) ? new List<Quest>() : Quests;
     }
-
 }
