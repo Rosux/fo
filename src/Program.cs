@@ -10,15 +10,20 @@ class Program
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
         WriteLogo();
-        // Console.WriteLine("Press ENTER to start.");
-        // ConsoleKey key;
-        // do
-        // {
-        //     key = Console.ReadKey(true).Key;
-        // } while (key != ConsoleKey.Enter);
-
-        Player p = new Player();
+        Console.WriteLine("Press ENTER to start.");
+        ConsoleKey key;
+        do
+        {
+            key = Console.ReadKey(true).Key;
+        } while (key != ConsoleKey.Enter);
+        Stats stats = new Stats(100, 100, 12, 20, 100);
+        Player p = new Player("Player", stats, null, null);
         Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true);
+
+
+        // Quest quest1 = new Quest("kill the goblin", QuestTy*--pe.KILL, KillType.GOBLIN, 3);
+        // p.StartQuest(quest1);
+        // p.UpdateQuests();
 
         p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
         p.Inventory.Add(new Weapon(0, "Golden Sword", 300));

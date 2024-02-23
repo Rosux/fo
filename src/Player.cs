@@ -12,4 +12,13 @@ public class Player
         this.Inventory = (Inventory == null) ? new Inventory() : Inventory;
         this.OngoingQuests = (Quests == null) ? new List<Quest>() : Quests;
     }
+    public void StartQuest(Quest quest)
+    {
+        quest.Start(this);
+    }
+
+    public void UpdateQuests()
+    {
+        Quest.UpdateQuests(this);
+    }
 }
