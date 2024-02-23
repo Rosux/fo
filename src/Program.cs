@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 
 class Program
 {
@@ -18,42 +19,42 @@ class Program
         } while (key != ConsoleKey.Enter);
 
         // player example
-        Player p = new Player();
-        p.Stats.Gold = 666;
+        // Player p = new Player();
+        // p.Stats.Gold = 666;
 
         // npc example with callback (run code after choosing an option)
-        bool wannaTrade = false;
-        Dialogue johnDialogue = new Dialogue();
-        johnDialogue.AddNode("1", "Yo i got cookies want some?", new List<Option>(){
-            new Option("Yes", null, "1", () => {
-                wannaTrade = true;
-            }),
-            new Option("No", null, "1", () => {
-                wannaTrade = false;
-            }),
-        });
-        Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true, null, johnDialogue);
-        john.Stats.Gold = 2000;
+        // bool wannaTrade = false;
+        // Dialogue johnDialogue = new Dialogue();
+        // johnDialogue.AddNode("1", "Yo i got cookies want some?", new List<Option>(){
+        //     new Option("Yes", null, "1", () => {
+        //         wannaTrade = true;
+        //     }),
+        //     new Option("No", null, "1", () => {
+        //         wannaTrade = false;
+        //     }),
+        // });
+        // Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true, null, johnDialogue);
+        // john.Stats.Gold = 2000;
 
         // adding stuff to inventories
-        p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
-        p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
-        john.Inventory.Add(new Usable(1, "Cookie", 667));
-        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
-        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
-        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
-        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
-        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
-        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        // p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
+        // p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
+        // john.Inventory.Add(new Usable(1, "Cookie", 667));
+        // john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        // john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        // john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        // john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        // john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        // john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
 
         
         // start talking
-        Talk(john);
-        if (wannaTrade)
-        {
-            // start trading
-            Trade(p, john);
-        }
+        // Talk(john);
+        // if (wannaTrade)
+        // {
+        //     // start trading
+        //     Trade(p, john);
+        // }
 
         // Console.WriteLine($"{p.Name} {p.Stats.Gold}");
         // Talk(GameNpcs[0]);
@@ -69,6 +70,16 @@ class Program
         // Console.WriteLine(inv.GetArmorPoints());
         // inv.Sell(2, s);
         // Console.WriteLine(s.Gold);
+        // List<Location> locations = InitializeLocations();
+        // World myWorld = new World(locations);
+        // Stats playerStats = new Stats(CurrentHealth: 100, MaxHealth: 100, Attack: 20, Defence: 10, Gold: 100);
+        // Console.WriteLine("Available Locations:");
+        // myWorld.PrintAllLocations();
+        // Location destination = GetValidLocationInput(locations);
+
+        // myWorld.Travel(destination, playerStats);
+        // Console.WriteLine($"Current Location: {myWorld.CurrentLocation.Name}");
+        // Console.WriteLine($"Remaining Gold: {playerStats.Gold}");
     }
 
     static void CreateNpc()
@@ -87,6 +98,63 @@ class Program
         GameNpcs.Add(
             new Npc("Peter Griffin", NpcType.HUMAN, new Stats(), new Inventory(), false, new List<Quest>(), peterDialogue)
         );
+    }
+    
+    static Location GetValidLocationInput(List<Location> locations) // maybe remove
+    {
+        Location destination = null;
+
+            while (destination == null)
+            {
+                Console.Write("Enter the name of the location you want to travel to: ");
+                string userInput = Console.ReadLine();
+
+                destination = locations.Find(loc => loc.Name.Equals(userInput, StringComparison.OrdinalIgnoreCase));
+
+                if (destination == null)
+                {
+                    Console.WriteLine("Invalid location name. Please enter a valid name.");
+                }
+            }
+
+        return destination;
+    }
+
+    static List<Location> InitializeLocations()
+    {   
+        // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
+        SubLocation Bar = new SubLocation("Bar", new List<Npc>());
+        SubLocation Fountain = new SubLocation("Fountain", new List<Npc>());
+        SubLocation Town_Square = new SubLocation("Town Square", new List<Npc>());
+        SubLocation Shop = new SubLocation("Shop", new List<Npc>());
+        SubLocation Hospital = new SubLocation("Hospital", new List<Npc>()); 
+
+        Location Town = new Location("Town", new List<SubLocation>{Bar, Fountain, Town_Square, Shop, Hospital}, 20);
+        // Console.WriteLine(Town);
+
+        // Location Castle SubLocations: Treasury, Throne Room, Dungeon
+        SubLocation Treasury = new SubLocation("Treasury", new List<Npc>());
+        SubLocation Throne_Room = new SubLocation("Throne Room", new List<Npc>());
+        SubLocation Dungeon = new SubLocation("Dungeon", new List<Npc>());
+
+        Location Castle = new Location("Castle", new List<SubLocation>{Treasury, Throne_Room, Dungeon}, 40);
+        // Console.WriteLine(Castle);
+
+        // Location: Mountain SubLocations: Cave, Vulcano
+        SubLocation Cave = new SubLocation("Cave", new List<Npc>());
+        SubLocation Vulcano = new SubLocation("Vulcano", new List<Npc>());
+
+        Location Mountain = new Location("Mountain", new List<SubLocation>{Cave, Vulcano}, 60);
+        // Console.WriteLine(Mountain);
+
+        // Location: Farm SubLocations: River, Woods, Farmhouse
+        SubLocation River = new SubLocation("River", new List<Npc>());
+        SubLocation Woods = new SubLocation("Woods", new List<Npc>());
+        SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>());
+
+        Location Farm = new Location("Farm", new List<SubLocation>{River, Woods, Farmhouse}, 80);
+        // Console.WriteLine(Farm);
+        return new List<Location> { Town, Castle, Mountain, Farm };
     }
 
     static void WriteCenter(string text)
