@@ -48,6 +48,11 @@ public class Inventory
         return true;
     }
 
+    public void Remove(int Index)
+    {
+        this.Items.RemoveAt(Index);
+    }
+
     public int GetArmorPoints()
     {
         if (!Contains(ItemType.ARMOR)){ return 0; }
@@ -139,6 +144,42 @@ public class Inventory
             }
         }
         return longest;
+    }
+
+    public int GetValue(int Index)
+    {
+        if (Index < 0 || Index >= this.Items.Count){ return 0; }
+        switch ((this.Items[Index] as dynamic).Type)
+        {
+            case ItemType.WEAPON:
+                Weapon weapon = (Weapon)this.Items[Index];
+                return weapon.Worth;
+            case ItemType.ARMOR:
+                Armor armor = (Armor)this.Items[Index];
+                return armor.Worth;
+            case ItemType.USABLE:
+                Usable usable = (Usable)this.Items[Index];
+                return usable.Worth;
+        }
+        return 0;
+    }
+    
+    public string GetName(int Index)
+    {
+        if (Index < 0 || Index >= this.Items.Count){ return ""; }
+        switch ((this.Items[Index] as dynamic).Type)
+        {
+            case ItemType.WEAPON:
+                Weapon weapon = (Weapon)this.Items[Index];
+                return weapon.Name;
+            case ItemType.ARMOR:
+                Armor armor = (Armor)this.Items[Index];
+                return armor.Name;
+            case ItemType.USABLE:
+                Usable usable = (Usable)this.Items[Index];
+                return usable.Name;
+        }
+        return "";
     }
 }
 

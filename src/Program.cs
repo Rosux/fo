@@ -10,21 +10,50 @@ class Program
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
         WriteLogo();
-        // Console.WriteLine("Press ENTER to start.");
-        // ConsoleKey key;
-        // do
-        // {
-        //     key = Console.ReadKey(true).Key;
-        // } while (key != ConsoleKey.Enter);
+        Console.WriteLine("Press ENTER to start.");
+        ConsoleKey key;
+        do
+        {
+            key = Console.ReadKey(true).Key;
+        } while (key != ConsoleKey.Enter);
 
+        // player example
         Player p = new Player();
-        Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true);
+        p.Stats.Gold = 666;
 
+        // npc example with callback (run code after choosing an option)
+        bool wannaTrade = false;
+        Dialogue johnDialogue = new Dialogue();
+        johnDialogue.AddNode("1", "Yo i got cookies want some?", new List<Option>(){
+            new Option("Yes", null, "1", () => {
+                wannaTrade = true;
+            }),
+            new Option("No", null, "1", () => {
+                wannaTrade = false;
+            }),
+        });
+        Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true, null, johnDialogue);
+        john.Stats.Gold = 2000;
+
+        // adding stuff to inventories
         p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
         p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
-        john.Inventory.Add(new Weapon(0, "Stone Sword", 10));
+        john.Inventory.Add(new Usable(1, "Cookie", 667));
+        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
+        john.Inventory.Add(new Weapon(0, "Wooden Sword", 10));
 
-        Trade(p, john);
+        
+        // start talking
+        Talk(john);
+        if (wannaTrade)
+        {
+            // start trading
+            Trade(p, john);
+        }
 
         // Console.WriteLine($"{p.Name} {p.Stats.Gold}");
         // Talk(GameNpcs[0]);
@@ -238,40 +267,117 @@ class Program
         while (true)
         {
             Console.Clear();
-            Console.BackgroundColor = ConsoleColor.Black;
             string arrow = (sell) ? "->" : "<-";
+
+            // print menu with all player and npc items
+            Console.BackgroundColor = ConsoleColor.Black;
+
+            Console.Write($"Your Gold: {player.Stats.Gold}{new string(' ', longestPlayerString-player.Stats.Gold.ToString().Length)}    {npc.Name}'s Gold: {npc.Stats.Gold}\n");
             Console.Write($"┌─Your Items{new string('─', Math.Max(0, longestPlayerString-10))}─┬─Gold─┐ {arrow} ┌─{npc.Name}'s Items{new string('─', Math.Max(0, (longestNpcString-npc.Name.Length)-8))}─┬─Gold─┐\n");
-            
-            for (int i = 0; i < Math.Max(npc.Inventory.Items.Count, player.Inventory.Items.Count); i++)
+            for (int i = 0; i < Math.Max(npc.Inventory.Items.Count, player.Inventory.Items.Count)+1; i++)
             {
-                Console.WriteLine(i);
+                // print player items
+                Console.BackgroundColor = ConsoleColor.Black;
+                if (i < player.Inventory.Items.Count) {
+                    string playerItemName = player.Inventory.GetName(i);
+                    int playerItemValue = player.Inventory.GetValue(i);
+                    // write the name of the player item
+                    Console.Write("│ ");
+                    if (sell && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
+                    Console.Write($"{playerItemName}{new string(' ', longestPlayerString-playerItemName.Length)} │ {playerItemValue,4}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write(" │    ");
+                } else if (i == player.Inventory.Items.Count) {
+                    Console.Write($"└─{new string('─', longestPlayerString)}─┴──────┘    ");
+                } else {
+                    Console.Write($"{new string(' ', longestPlayerString+11)}    ");
+                }
+                // print npc items
+                Console.BackgroundColor = ConsoleColor.Black;
+                if (i < npc.Inventory.Items.Count) {
+                    string npcItemName = npc.Inventory.GetName(i);
+                    int npcItemValue = npc.Inventory.GetValue(i);
+                    Console.Write("│ ");
+                    if (!sell && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
+                    Console.Write($"{npcItemName}{new string(' ', longestNpcString-npcItemName.Length)} │ {npcItemValue,4}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write(" │\n");
+                } else if (i == npc.Inventory.Items.Count) {
+                    Console.Write($"└─{new string('─', longestNpcString)}─┴──────┘\n");
+                } else {
+                    Console.Write("\n");
+                }
             }
-
-            string playerItemName = ((Weapon)player.Inventory.Items[0]).Name;
-            int playerItemValue = ((Weapon)player.Inventory.Items[0]).Worth;
-            string playerItem = $"│ {playerItemName}{new string(' ', longestPlayerString-playerItemName.Length)} │ {playerItemValue,4} │";
-
-            string npcItemName = ((Weapon)npc.Inventory.Items[0]).Name;
-            int npcItemValue = ((Weapon)npc.Inventory.Items[0]).Worth;
-            string npcItem = $"│ {npcItemName}{new string(' ', longestNpcString-npcItemName.Length)} │ {npcItemValue,4} │";
-
-            Console.Write($"{playerItem}    {npcItem}");
+            Console.Write("Up/Down/Left/Right = Move around\nEnter = Buy/Sell\nESC = Stop trading");
+            // handle input like up/down/left/right/enter
             ConsoleKey key;
             do{
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.LeftArrow)
                 {
-                    sell = true;
+                    if (player.Inventory.Items.Count > 0)
+                    {
+                        sell = true;
+                        currentChoice = 0;
+                    }
                 }
                 if (key == ConsoleKey.RightArrow)
                 {
-                    sell = false;
+                    if (npc.Inventory.Items.Count > 0)
+                    {
+                        sell = false;
+                        currentChoice = 0;
+                    }
                 }
-            } while (key != ConsoleKey.Enter && key != ConsoleKey.LeftArrow && key != ConsoleKey.RightArrow && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow);
+                if (key == ConsoleKey.UpArrow)
+                {
+                    currentChoice--;
+                }
+                if (key == ConsoleKey.DownArrow)
+                {
+                    currentChoice++;
+                }
+                if (key == ConsoleKey.Enter)
+                {
+                    if (!sell && player.Inventory.Items.Count < 10 && player.Stats.Pay(npc.Inventory.GetValue(currentChoice)))
+                    {
+                        // buy from npc
+                        // could add logic here to increase the price its sold for
+                        player.Inventory.Add(npc.Inventory.Items[currentChoice]);
+                        npc.Inventory.Sell(currentChoice, npc.Stats);
+                        currentChoice -= 1;
+                        if (npc.Inventory.Items.Count == 0)
+                        {
+                            currentChoice = 0;
+                            sell = true;
+                        }
+                    }
+                    else if (sell && npc.Inventory.Items.Count < 10 && npc.Stats.Pay(player.Inventory.GetValue(currentChoice)))
+                    {
+                        // sell to npc
+                        // could add logic to decrease the price its sold for to the npc like some npc's are scammers and some are generous or something
+                        npc.Inventory.Add(player.Inventory.Items[currentChoice]);
+                        player.Inventory.Sell(currentChoice, player.Stats);
+                        if (player.Inventory.Items.Count == 0)
+                        {
+                            currentChoice = 0;
+                    sell = false;
+                    sell = false;
+                            sell = false;
+                        }
+                    }
+                }
+                if (key == ConsoleKey.Escape)
+                {
+                    return;
+                }
+                currentChoice = (sell) ? Math.Clamp(currentChoice, 0, Math.Max(0, player.Inventory.Items.Count-1)) : Math.Clamp(currentChoice, 0, Math.Max(0, npc.Inventory.Items.Count-1)); 
+            } while (key != ConsoleKey.Escape && key != ConsoleKey.Enter && key != ConsoleKey.LeftArrow && key != ConsoleKey.RightArrow && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow);
         }
     }
 }
 
+// Your Gold: 940                  John's Gold: 69420
 // ┌─Your Items────────┬─Gold─┐ <- ┌─John's Items─────┬─Gold─┐
 // │ Sword             │    1 │    │ Buying this item │    1 │
 // │ Helmet            │   13 │    │ Iron Chestplate  │   13 │
