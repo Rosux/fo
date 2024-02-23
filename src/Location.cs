@@ -11,6 +11,6 @@ public class Location
     } 
     public override string ToString()
     {
-        return $"Location: {Name}\nTravelPrice: {TravelPrice}\n{string.Join("\n", SubLocations)}";
+        return $"Location: {Name}\nTravelPrice: {TravelPrice}\n";
     }
 }

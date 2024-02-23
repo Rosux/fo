@@ -19,10 +19,32 @@ class Program
         List<Location> locations = InitializeLocations();
         World myWorld = new World(locations);
         Stats playerStats = new Stats(CurrentHealth: 100, MaxHealth: 100, Attack: 20, Defence: 10, Gold: 100);
+        Console.WriteLine("Available Locations:");
         myWorld.PrintAllLocations();
-        myWorld.Travel(myWorld.Locations[1], playerStats);
+        Location destination = GetValidLocationInput(locations);
+
+        myWorld.Travel(destination, playerStats);
         Console.WriteLine($"Current Location: {myWorld.CurrentLocation.Name}");
         Console.WriteLine($"Remaining Gold: {playerStats.Gold}");
+    }
+    static Location GetValidLocationInput(List<Location> locations)
+    {
+        Location destination = null;
+
+            while (destination == null)
+            {
+                Console.Write("Enter the name of the location you want to travel to: ");
+                string userInput = Console.ReadLine();
+
+                destination = locations.Find(loc => loc.Name.Equals(userInput, StringComparison.OrdinalIgnoreCase));
+
+                if (destination == null)
+                {
+                    Console.WriteLine("Invalid location name. Please enter a valid name.");
+                }
+            }
+
+        return destination;
     }
     static List<Location> InitializeLocations()
     {   
