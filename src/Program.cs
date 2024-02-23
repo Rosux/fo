@@ -21,15 +21,16 @@ class Program
         Npc john = new Npc("John", NpcType.HUMAN, null, new Inventory(), true);
 
 
-        // Quest quest1 = new Quest("kill the goblin", QuestTy*--pe.KILL, KillType.GOBLIN, 3);
-        // p.StartQuest(quest1);
-        // p.UpdateQuests();
+        Quest quest1 = new Quest("kill the goblin", QuestType.KILL, KillType.GOBLIN,  ItemType.None, 3, 0 );
+        p.StartQuest(quest1);
+        Console.WriteLine(p.OngoingQuests);
+        p.UpdateQuests();
 
-        p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
-        p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
-        john.Inventory.Add(new Weapon(0, "Stone Sword", 10));
+        // p.Inventory.Add(new Weapon(0, "Iron Sword", 23));
+        // p.Inventory.Add(new Weapon(0, "Golden Sword", 300));
+        // john.Inventory.Add(new Weapon(0, "Stone Sword", 10));
 
-        Trade(p, john);
+        // Trade(p, john);
 
         // Console.WriteLine($"{p.Name} {p.Stats.Gold}");
         // Talk(GameNpcs[0]);
