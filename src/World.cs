@@ -2,31 +2,27 @@ public class World
 {
     public List<Location> Locations; // holds the Town/Castle/Mountain/Farm
     public Location CurrentLocation;
+    public SubLocation? CurrentSubLocation;
+
     public World(List<Location> Locations)
     {
         this.Locations = Locations;
     }
-    public void Travel(Location destination, Stats playerStats)
-    {
-        if (Locations.Contains(destination))
-        {
-            int travelCost = destination.TravelPrice;
 
-            if (playerStats.Gold >= travelCost)
-            {
-                playerStats.Gold -= travelCost;
-                CurrentLocation = destination;
-                Console.WriteLine($"Traveled to {destination.Name} for {travelCost} gold.");
-            }
-            else
-            {
-                Console.WriteLine("Not enough gold to travel.");
-            }
-        }
-        else
+    public bool TravelToLocation(Location destination)
+    {
+        if (Locations.Contains(destination) && !destination.Locked)
         {
-            Console.WriteLine("Invalid destination.");
+            this.CurrentLocation = destination;
+            this.CurrentSubLocation = null;
+            return true;
         }
+        return false;
+    }
+
+    public void TravelToSubLocation(SubLocation destination)
+    {
+        this.CurrentSubLocation = destination;
     }
     
     public void PrintAllLocations()
@@ -35,5 +31,31 @@ public class World
         {
             Console.WriteLine(location);
         }
+    }
+
+    public int GetLongestLocation()
+    {
+        int longest = -1;
+        for (int i = 0; i < this.Locations.Count; i++)
+        {
+            if (this.Locations[i].Name.Length > longest)
+            {
+                longest = this.Locations[i].Name.Length;
+            }
+        }
+        return longest;
+    }
+
+    public int GetLongestSubLocation(Location location)
+    {
+        int longest = -1;
+        for (int i = 0; i < location.SubLocations.Count; i++)
+        {
+            if (location.SubLocations[i].Name.Length > longest)
+            {
+                longest = location.SubLocations[i].Name.Length;
+            }
+        }
+        return longest;
     }
 }
