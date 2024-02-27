@@ -8,7 +8,7 @@ class Program
     static Audio GameAudio = new Audio();
     static void Main(string[] args)
     {
-        Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(45, "Standard sword", 35)}));
+        Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "bruh", 50), new Weapon(20, "Standard sword", 35) }));
         CreateNpc();
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
@@ -20,8 +20,10 @@ class Program
             key = Console.ReadKey(true).Key;
         } while (key != ConsoleKey.Enter);
         
-        // Travel(GamePlayer);
-        Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 1, 1, 500), new Inventory(), false);
+        Travel(GamePlayer);
+
+        Fight(GamePlayer, badNpc);
+        badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 1, 1, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
         Fight(GamePlayer, badNpc);
     }
 
@@ -130,12 +132,24 @@ class Program
 
     private static World InitializeWorld()
     {
+        Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 0, 0, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
+        Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, quest, dialogue);
+        Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 5000), new Inventory(), true, quest, dialogue);
+        Npc Drunkerd = new Npc("Maikel Maloy", NpcType.HUMAN, new Stats(50, 0, 0, 2000), new Inventory(), false, null, dialogue);
+        Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, dialogue);
+        Npc Hobbo = new Npc("Kevin", NpcType.HUMAN, new Stats(10, 0, 0, 0), new Inventory(), false, null, dialogue);
+        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, dialogue);
+        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(), true, null, dialogue);
+        Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, dialogue);
+        Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, dialogue);
+        Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, quest, dialogue);
+
         // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
-        SubLocation Bar = new SubLocation("Bar", new List<Npc>());
-        SubLocation Fountain = new SubLocation("Fountain", new List<Npc>());
-        SubLocation Town_Square = new SubLocation("Town Square", new List<Npc>());
-        SubLocation Shop = new SubLocation("Shop", new List<Npc>());
-        SubLocation Hospital = new SubLocation("Hospital", new List<Npc>()); 
+        SubLocation Bar = new SubLocation("Bar", new List<Npc>(){Drunkerd, Barkeeper});
+        SubLocation Fountain = new SubLocation("Fountain", new List<Npc>(){Bird, Hobbo});
+        SubLocation Town_Square = new SubLocation("Town Square", new List<Npc>(){Ronnie});
+        SubLocation Shop = new SubLocation("Shop", new List<Npc>(){Shopkeeper, Thieff});
+        SubLocation Hospital = new SubLocation("Hospital", new List<Npc>(){Nurse, Patient}); 
 
         Location Town = new Location("Town", new List<SubLocation>{Bar, Fountain, Town_Square, Shop, Hospital}, 400);
         // Console.WriteLine(Town);
@@ -738,12 +752,12 @@ class Program
                         player.Inventory.Add(npc.Inventory.Items[currentChoice]);
                         npc.Inventory.Remove(currentChoice);
                         GameAudio.PlayRandomDrop();
-                        currentChoice -= 1;
                         if (npc.Inventory.Items.Count == 0)
                         {
                             drop = true;
                             currentChoice = 0;
                         }
+                        currentChoice -= 1;
                     }
                     else if (drop)
                     {
