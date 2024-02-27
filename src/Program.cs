@@ -5,9 +5,10 @@ using System.Threading;
 class Program
 {
     static World GameWorld = InitializeWorld();
+    static Audio GameAudio = new Audio();
     static void Main(string[] args)
     {
-        Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000));
+        Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(45, "Standard sword", 35)}));
         CreateNpc();
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
@@ -19,7 +20,9 @@ class Program
             key = Console.ReadKey(true).Key;
         } while (key != ConsoleKey.Enter);
         
-        Travel(GamePlayer);
+        // Travel(GamePlayer);
+        Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 1, 1, 500), new Inventory(), false);
+        Fight(GamePlayer, badNpc);
     }
 
     static void Travel(Player player)
@@ -124,26 +127,6 @@ class Program
         });
         return new List<Npc>(){new Npc("Peter Griffin", NpcType.HUMAN, new Stats(), new Inventory(), false, new List<Quest>(), peterDialogue)};
     }
-    
-    // private static Location GetValidLocationInput(List<Location> locations) // maybe remove
-    // {
-    //     Location destination = null;
-
-    //         while (destination == null)
-    //         {
-    //             Console.Write("Enter the name of the location you want to travel to: ");
-    //             string userInput = Console.ReadLine();
-
-    //             destination = locations.Find(loc => loc.Name.Equals(userInput, StringComparison.OrdinalIgnoreCase));
-
-    //             if (destination == null)
-    //             {
-    //                 Console.WriteLine("Invalid location name. Please enter a valid name.");
-    //             }
-    //         }
-
-    //     return destination;
-    // }
 
     private static World InitializeWorld()
     {
@@ -289,6 +272,13 @@ class Program
         }
 
         if (!npc.CanFight) { return; }
+        if (player.Inventory.GetWeaponDamage() <= 0)
+        {
+            Console.Clear();
+            Console.WriteLine("You do not have a weapon to fight...\n\nPress any key to continue.");
+            Console.ReadKey(true);
+            return;
+        }
         int currentChoice = 0;
         Random r = new Random();
         do
@@ -360,6 +350,7 @@ class Program
                             (Usable npcItem, int healing) = npc.Inventory.UseHealItem(npc.Stats);
                             Console.Write($"You did {totalDamage} damage to {npc.Name}!\n{npc.Name} used {npcItem.Name} for {healing} healing!\n\n");
                         }
+                        if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else { GameAudio.PlayRandomHit(); }
                     }
                     else if (currentChoice == 1) // player blocks
                     {
@@ -382,6 +373,7 @@ class Program
                             (Usable npcItem, int healing) = npc.Inventory.UseHealItem(npc.Stats);
                             Console.Write($"{npc.Name} used {npcItem.Name} for {healing} healing!\nYou blocked 0 damage!\n\n");
                         }
+                        if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else { GameAudio.PlayRandomBlock(); }
                     }
                     else if (currentChoice == 2) // player uses item
                     {
@@ -411,6 +403,7 @@ class Program
                         }
                         player.Stats.Heal(item.Amount);
                         player.Inventory.Remove(item);
+                        if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); }
                     }
                     // print health and npc health
                     Console.Write($"You: {player.Stats.CurrentHealth}/{player.Stats.MaxHealth}\n");
@@ -444,10 +437,24 @@ class Program
             if(npc.Type == NpcType.DOG){
                 WriteParchment($"Death Certificate\n\nToday our dearest {npc.Name} left us behind.\n\nR.I.P. {npc.Name}");
             }
-            ConsoleKey key;
-            Loot(player, npc);
-            Console.Write("\nPress any key to continue...\n");
+            for (int i = 0; i < player.OngoingQuests.Count; i++)
+            {
+                if (player.OngoingQuests[i].QuestType == QuestType.KILL && player.OngoingQuests[i].KillType == npc.Type)
+                {
+                    player.OngoingQuests[i].CurrentKills++;
+                    if(player.OngoingQuests[i].CheckCompletion())
+                    {
+                        if (player.OngoingQuests[i].Callback != null)
+                        {
+                            player.OngoingQuests[i].Callback();
+                        }
+                        player.OngoingQuests[i].Complete(player);
+                    }
+                }
+            }
+            Console.Write($"You killed {npc.Name}!!!\nPress any key to continue looting...\n");
             Console.ReadKey(true);
+            Loot(player, npc);
         }
         else if (player.Stats.CurrentHealth <= 0)
         {
@@ -597,6 +604,7 @@ class Program
                         // could add logic here to increase the price its sold for
                         player.Inventory.Add(npc.Inventory.Items[currentChoice]);
                         npc.Inventory.Sell(currentChoice, npc.Stats);
+                        GameAudio.PlayRandomDrop();
                         currentChoice -= 1;
                         if (npc.Inventory.Items.Count == 0)
                         {
@@ -610,12 +618,25 @@ class Program
                         // could add logic to decrease the price its sold for to the npc like some npc's are scammers and some are generous or something
                         npc.Inventory.Add(player.Inventory.Items[currentChoice]);
                         player.Inventory.Sell(currentChoice, player.Stats);
+                        GameAudio.PlayRandomDrop();
                         if (player.Inventory.Items.Count == 0)
                         {
                             currentChoice = 0;
-                    sell = false;
-                    sell = false;
                             sell = false;
+                        }
+                        for (int i = 0; i < player.OngoingQuests.Count; i++)
+                        {
+                            if (player.OngoingQuests[i].QuestType == QuestType.FETCH)
+                            {
+                                if(player.OngoingQuests[i].CheckCompletion())
+                                {
+                                    if (player.OngoingQuests[i].Callback != null)
+                                    {
+                                        player.OngoingQuests[i].Callback();
+                                    }
+                                    player.OngoingQuests[i].Complete(player);
+                                }
+                            }
                         }
                     }
                 }
@@ -716,6 +737,7 @@ class Program
                         // take from npc
                         player.Inventory.Add(npc.Inventory.Items[currentChoice]);
                         npc.Inventory.Remove(currentChoice);
+                        GameAudio.PlayRandomDrop();
                         currentChoice -= 1;
                         if (npc.Inventory.Items.Count == 0)
                         {
@@ -727,6 +749,7 @@ class Program
                     {
                         // drop
                         player.Inventory.Remove(currentChoice);
+                        GameAudio.PlayRandomDrop();
                         if (player.Inventory.Items.Count == 0)
                         {
                             currentChoice = 0;
@@ -872,3 +895,16 @@ class Program
 // | ~~~ |
 // |R.I.P|
 // |_____|
+
+//[ goblins ]=-  6/97
+//             ,      ,
+//            /(.-""-.)\
+//        |\  \/      \/  /|
+//        | \ / =.  .= \ / |
+//        \( \   o\/o   / )/
+//         \_, '-/  \-' ,_/
+//           /   \__/   \
+//           \ \__/\__/ /
+//         ___\ \|--|/ /___
+//       /`    \      /    `\
+//  jgs /       '----'       \
