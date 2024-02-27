@@ -4,5 +4,6 @@ public enum NpcType
     GOBLIN,
     DWARF,
     DEMON,
-    BIRD
+    BIRD,
+    DOG
 }

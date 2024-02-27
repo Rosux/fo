@@ -4,11 +4,11 @@ using System.Threading;
 
 class Program
 {
-    static World GameWorld = InitializeWorld();
+    static Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "bruh", 50), new Weapon(20, "Standard sword", 35) }));
+    static World GameWorld = InitializeWorld(GamePlayer);
     static Audio GameAudio = new Audio();
     static void Main(string[] args)
     {
-        Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "bruh", 50), new Weapon(20, "Standard sword", 35) }));
         CreateNpc();
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
@@ -19,12 +19,10 @@ class Program
         {
             key = Console.ReadKey(true).Key;
         } while (key != ConsoleKey.Enter);
-        
-        Travel(GamePlayer);
 
-        Fight(GamePlayer, badNpc);
-        badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 1, 1, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
-        Fight(GamePlayer, badNpc);
+        Travel(GamePlayer);
+        Talk(GameWorld.CurrentSubLocation.Npcs[0]);
+        
     }
 
     static void Travel(Player player)
@@ -130,22 +128,48 @@ class Program
         return new List<Npc>(){new Npc("Peter Griffin", NpcType.HUMAN, new Stats(), new Inventory(), false, new List<Quest>(), peterDialogue)};
     }
 
-    private static World InitializeWorld()
+    private static World InitializeWorld(Player player)
     {
+
+        // barkeeper example
+        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 15), new Inventory(), true, null, null);
+        Dialogue drunkardDialogue = new Dialogue();
+        drunkardDialogue.AddNode("1", "awwha whhah hahwhw whahh\nwwahahhahhhhwhah (What do you want?)", new List<Option>(){
+            new Option("I can help you", "1.1"),
+            new Option("Never mind", null, "1"),
+        });
+        drunkardDialogue.AddNode("1.1", "whahh ahwhhwh whhahhah\nhwhha ha (Can you get me some beer?\nFrom the cave dwarfs.)", new List<Option>(){
+            new Option("Sure", "1.1.1", null, ()=>{
+                player.AddQuest(
+                    new Quest("Fetch a beer and deliver it to the drunkard.", QuestType.FETCH, ItemType.USABLE, "Beer", drunkard, null)
+                );
+                drunkardDialogue.RemoveOption("1", 0);
+            }),
+            new Option("No", null, "1"),
+        });
+        
+        drunkardDialogue.AddNode("1.1.1", "ahwha whahawhwu awuhwah uuhwa\nahhhhwhah (Thanks)", new List<Option>(){
+            new Option("...", null, "1"),
+        });
+        drunkard.Dialogue = drunkardDialogue;
+        drunkard.CanTalk = true;
+
+
+
+        Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 1421), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Beer", 40)}), true, null, null);
         Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 0, 0, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
-        Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, quest, dialogue);
-        Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 5000), new Inventory(), true, quest, dialogue);
-        Npc Drunkerd = new Npc("Maikel Maloy", NpcType.HUMAN, new Stats(50, 0, 0, 2000), new Inventory(), false, null, dialogue);
-        Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, dialogue);
-        Npc Hobbo = new Npc("Kevin", NpcType.HUMAN, new Stats(10, 0, 0, 0), new Inventory(), false, null, dialogue);
-        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, dialogue);
-        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(), true, null, dialogue);
-        Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, dialogue);
-        Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, dialogue);
-        Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, quest, dialogue);
+        Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, null, null);
+        Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, null);
+        Npc Hobbo = new Npc("Kevin", NpcType.HUMAN, new Stats(10, 0, 0, 0), new Inventory(), false, null, null);
+        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, null);
+        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(), true, null, null);
+        Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, null);
+        Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, null);
+        Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, null, null);
+        // King Terry the Terrible
 
         // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
-        SubLocation Bar = new SubLocation("Bar", new List<Npc>(){Drunkerd, Barkeeper});
+        SubLocation Bar = new SubLocation("Bar", new List<Npc>(){drunkard, Barkeeper});
         SubLocation Fountain = new SubLocation("Fountain", new List<Npc>(){Bird, Hobbo});
         SubLocation Town_Square = new SubLocation("Town Square", new List<Npc>(){Ronnie});
         SubLocation Shop = new SubLocation("Shop", new List<Npc>(){Shopkeeper, Thieff});
@@ -746,7 +770,7 @@ class Program
                 }
                 if (key == ConsoleKey.Enter)
                 {
-                    if (!drop && player.Inventory.Items.Count < 10)
+                    if (!drop && player.Inventory.Items.Count < 10 && npc.Inventory.Items.Count > 0)
                     {
                         // take from npc
                         player.Inventory.Add(npc.Inventory.Items[currentChoice]);
@@ -759,7 +783,7 @@ class Program
                         }
                         currentChoice -= 1;
                     }
-                    else if (drop)
+                    else if (drop && player.Inventory.Items.Count > 0)
                     {
                         // drop
                         player.Inventory.Remove(currentChoice);

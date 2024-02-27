@@ -25,6 +25,11 @@ public class Dialogue
         this.Nodes[NodeId].Options.Add(option);
     }
 
+    public void RemoveOption(string NodeId, int optionIndex)
+    {
+        this.Nodes[NodeId].Options.RemoveAt(optionIndex);
+    }
+
     /// <summary>
     /// Step to the next option.
     /// </summary>
