@@ -15,19 +15,25 @@ public class Npc
     {
         this.Name = Name;
         this.Type = Type;
-        if (Stats != null){
+        if (Stats != null)
+        {
             this.Stats = Stats;
             this.CanFight = true;
-        }else{
+        }
+        else
+        {
             this.Stats = new Stats();
         }
         this.Inventory = (Inventory == null) ? new Inventory() : Inventory;
         this.CanTrade = CanTrade;
         this.Quests = (Quests == null) ? new List<Quest>() : Quests;
-        if (Dialogue != null){
+        if (Dialogue != null)
+        {
             this.Dialogue = Dialogue;
             this.CanTalk = true;
-        }else{
+        }
+        else
+        {
             this.Dialogue = Dialogue;
         }
     }

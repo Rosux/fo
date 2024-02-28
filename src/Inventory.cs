@@ -1,6 +1,14 @@
 public class Inventory
 {
     public List<object> Items;
+    private bool _HasUsable;
+    public bool HasUsables{
+        get
+        {
+            return Contains(ItemType.USABLE);
+        }
+        set{ _HasUsable = value; }
+    }
 
     public Inventory(List<object> items=null)
     {
@@ -12,6 +20,37 @@ public class Inventory
         {
             this.Items = items;
         }
+    }
+
+    public bool HasItem(string Item){
+        foreach (var i in this.Items)
+        {
+            switch ((i as dynamic).Type)
+            {
+                case ItemType.WEAPON:
+                    Weapon weapon = (Weapon)i;
+                    if (weapon.Name == Item)
+                    {
+                        return true;
+                    }
+                    break;
+                case ItemType.ARMOR:
+                    Armor armor = (Armor)i;
+                    if (armor.Name == Item)
+                    {
+                        return true;
+                    }
+                    break;
+                case ItemType.USABLE:
+                    Usable usable = (Usable)i;
+                    if (usable.Name == Item)
+                    {
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return false;
     }
 
     public void Sell(int Index, Stats stats)
@@ -38,6 +77,27 @@ public class Inventory
         return 0;
     }
 
+    public (Usable, int) UseHealItem(Stats stats)
+    {
+        for (int i = 0; i < this.Items.Count; i++)
+        {
+            var item = this.Items[i];
+            switch ((item as dynamic).Type)
+            {
+                case ItemType.USABLE:
+                    Usable usable = (Usable)item;
+                    if (usable.UseType == UseType.HEAL)
+                    {
+                        stats.Heal(usable.Amount);
+                        Remove(i);
+                        return (usable, usable.Amount);
+                    }
+                    break;
+            }
+        }
+        return (new Usable(UseType.HEAL, -1, "if you see this the inventory system is broken!", 99999999), -1);
+    }
+
     public bool Add(object Item)
     {
         if (this.Items.Count >= 10)
@@ -51,6 +111,21 @@ public class Inventory
     public void Remove(int Index)
     {
         this.Items.RemoveAt(Index);
+    }
+
+    public void Remove(Usable item)
+    {
+        this.Items.Remove(item);
+    }
+
+    public void Remove(Armor item)
+    {
+        this.Items.Remove(item);
+    }
+
+    public void Remove(Weapon item)
+    {
+        this.Items.Remove(item);
     }
 
     public int GetArmorPoints()
@@ -180,6 +255,41 @@ public class Inventory
                 return usable.Name;
         }
         return "";
+    }
+
+    public List<Usable> GetUsables()
+    {
+        List<Usable> usables = new List<Usable>();
+        foreach (var i in this.Items)
+        {
+            switch ((i as dynamic).Type)
+            {
+                case ItemType.USABLE:
+                    Usable usable = (Usable)i;
+                    usables.Add(usable);
+                    break;
+            }
+        }
+        return usables;
+    }
+
+    public List<Usable> GetHealingUsables()
+    {
+        List<Usable> usables = new List<Usable>();
+        foreach (var i in this.Items)
+        {
+            switch ((i as dynamic).Type)
+            {
+                case ItemType.USABLE:
+                    Usable usable = (Usable)i;
+                    if (usable.UseType == UseType.HEAL)
+                    {
+                        usables.Add(usable);
+                    }
+                    break;
+            }
+        }
+        return usables;
     }
 }
 
