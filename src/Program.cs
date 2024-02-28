@@ -21,7 +21,7 @@ class Program
         } while (key != ConsoleKey.Enter);
 
         Travel(GamePlayer);
-        Talk(GameWorld.CurrentSubLocation.Npcs[0]);
+        Talk(GameWorld.CurrentSubLocation.Npcs[1]);
         
     }
 
@@ -254,7 +254,30 @@ class Program
         Guards.Dialogue = guardsDialogue;
         Guards.CanTalk = true;
 
+        //barkeeper
         Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 1421), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Beer", 40)}), true, null, null);
+        Dialogue barkeeperdialogue = new Dialogue();
+        barkeeperdialogue.AddNode("1", "Welcome to my bar! \nWould you like anything to drink?", new List<Option>(){
+            new Option("Buy Beer ($20)", "1", null, ()=>{
+                if (GamePlayer.Stats.Pay(20))
+                {
+                    Barkeeper.Stats.AddGold(20);
+                    GamePlayer.Inventory.Add(new Usable(UseType.HEAL, 15, "Beer", 20));
+                }
+            }),
+            new Option("Buy Steak ($40)", "1", null, ()=>{
+                if (player.Stats.Pay(40))
+                {
+                    Barkeeper.Stats.AddGold(40);
+                    GamePlayer.Inventory.Add(new Usable(UseType.HEAL, 30, "Steak", 40));
+                }
+            }),
+            new Option("Leave", null, "1"),
+        });
+        Barkeeper.Dialogue = barkeeperdialogue;
+        Barkeeper.CanTalk = true;
+
+
         Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 0, 0, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
         Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, null, null);
         Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, null);
