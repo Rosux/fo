@@ -8,4 +8,5 @@ public enum NpcType
     DOG,
     SNAKE,
     FISH,
+    DRAGON,
 }

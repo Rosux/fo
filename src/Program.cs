@@ -131,7 +131,7 @@ class Program
     private static World InitializeWorld(Player player)
     {
 
-        // barkeeper example
+        // drunkard example
         Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 15), new Inventory(), true, null, null);
         Dialogue drunkardDialogue = new Dialogue();
         drunkardDialogue.AddNode("1", "awwha whhah hahwhw whahh\nwwahahhahhhhwhah (What do you want?)", new List<Option>(){
@@ -154,25 +154,119 @@ class Program
         drunkard.Dialogue = drunkardDialogue;
         drunkard.CanTalk = true;
 
+        // ronnie mcnutt
+        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, null);
+        Dialogue ronnieDialogue = new Dialogue();
+        ronnieDialogue.AddNode("1", "What brings you 'round here, stranger? You lookin' for trouble or just lost?", new List<Option>(){
+            new Option("I heard you got something for me", "1.1"),
+            new Option("Yeah I'm looking for trouble", "1.2"),
+        });
+        ronnieDialogue.AddNode("1.1", "Oh, its you! Here, I was going to use this but I changed my mind.", new List<Option>(){
+            new Option("Take", null, "1", ()=>{
+                player.Inventory.Add(new Weapon(40, "Shotgun", 200));
+                ronnieDialogue.RemoveOption("1", 0);
+            }),
+        });
+        ronnieDialogue.AddNode("1.2", "Well, you found it, partner. But let me tell ya, \ntrouble has a way of findin' folks like you even when they ain't lookin' for it.\n Best be careful 'round these parts", new List<Option>(){
+            new Option("Allright, I'll be on my way", null, "1"),
+        });
+        Ronnie.Dialogue = ronnieDialogue;
+        Ronnie.CanTalk = true;
 
+
+        // guillotine guy
+        Npc beheaded = new Npc("Guy in guillotine", NpcType.HUMAN, new Stats(200, 0, 0, 0), new Inventory(), true, null, null);
+        Dialogue beheadedDialogue = new Dialogue();
+        beheadedDialogue.AddNode("1", "Please, stranger, hear my plea. I'm innocent! \nThey've framed me! You must believe me", new List<Option>(){
+            new Option("I don't believe you", "1.1"),
+            new Option("Tell me more!", "1.2"),
+        });
+        beheadedDialogue.AddNode("1.1", "*Guy gets beheaded*", new List<Option>(){
+            new Option("steal coins", null, "1", () => {
+                GamePlayer.Stats.AddGold(40);
+                beheadedDialogue.RemoveOption("1", 0);
+            })
+        });
+        beheadedDialogue.AddNode("1.2", "I was framed by the king's son! He's the real culprit, I swear i- *SLPASH*", new List<Option>(){
+            new Option("....", null),
+        });
+        beheaded.Dialogue = beheadedDialogue;
+        beheaded.CanTalk = true;
+
+
+        //Patient prapor
+        Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, null, null);
+        Dialogue patientDialogue = new Dialogue();
+        patientDialogue.AddNode("1", "Hey... you there... Could ya help me? I got this letter... for Ronnie McNutt in the\x1b[1m town center\x1b[0m... Could ya take it for me?", new List<Option>(){
+            new Option("Of course, I'll make sure Ronnie gets it.", "1.1"),
+            new Option("Sorry, I'm busy right now", null, "1"),
+        });
+        patientDialogue.AddNode("1.1", "Thank you... you're a real lifesaver... literally...", new List<Option>(){
+            new Option("No problem.", null, "1", ()=>{
+                player.AddQuest(
+                    new Quest("Deliver letter to Ronnie McNutt in Town Centre", QuestType.FETCH, ItemType.USABLE, "Letter", Ronnie, null)
+                );
+                patientDialogue.RemoveOption("1", 0);
+            }),
+        });
+        Patient.Dialogue = patientDialogue;
+        Patient.CanTalk = true;
+
+        //King Nikita
+        Npc King = new Npc("Crazy king Nikita", NpcType.HUMAN, new Stats(150, 0, 0, 750), new Inventory(), false, null, null);
+        Dialogue kingDialogue = new Dialogue();
+        kingDialogue.AddNode("1", "Well well well... \nLook who arrived at my Castle!", new List<Option>(){
+            new Option("Continue", "1.1"),
+        });
+        kingDialogue.AddNode("1.1", "I have heard of you before. \nYou are one of the greatest fighters known.", new List<Option>(){
+            new Option("Continue", "1.2"),
+        });
+        kingDialogue.AddNode("1.2", "So, I will give you a quest \nfor you to prove your skills\nAre you up for this?", new List<Option>(){
+            new Option("Yes, what is it?", "1.3"),
+            new Option("Sorry, I'm busy right now", null, "1"),
+        });
+        kingDialogue.AddNode("1.3", "You must defeat \x1b[1mRobert the Dragon\x1b[0m in\nthe \x1b[1mVolcano\x1b[0m in the \x1b[1mMountain!\x1b[0m", new List<Option>(){
+            new Option("Let's do it!", "1.4"),
+            new Option("Nevermind, this sounds too scary", null, "1"),
+        });
+        kingDialogue.AddNode("1.4", "Okay! Good luck soldier!", new List<Option>(){
+            new Option("Continue", null, "1", ()=>{
+                player.AddQuest(
+                    new Quest("Kill the Dragon in the Volcano", QuestType.KILL, NpcType.DRAGON, 0)
+                );
+                kingDialogue.RemoveOption("1.2", 0);
+            }),
+        });
+        King.Dialogue = kingDialogue;
+        King.CanTalk = true;
+
+        Npc Guards = new Npc("Guard", NpcType.HUMAN, new Stats(300, 0, 0, 250), new Inventory(new List<Object>(){new Weapon(20, "Royal Sword X 5", 200)}), false, null, null);
+        Dialogue guardsDialogue = new Dialogue();
+        guardsDialogue.AddNode("1", "STOP! Who are you? \nYou can't just come to the treasury", new List<Option>(){
+            new Option("\"I am a traveller from the farms. I'm here for the King! \nWhere can i find him?\"", "1.1"),
+            new Option("Kill the guards", null, "1", ()=>{
+                Fight(GamePlayer, Guards);
+            }),
+        });
+        guardsDialogue.AddNode("1.1", "Allright, the king is in his throne room.\nI'd watch out though if I were you\nHe's a bit crazy", new List<Option>(){
+            new Option("Thanks", null, "1"),
+        });
+        Guards.Dialogue = guardsDialogue;
+        Guards.CanTalk = true;
 
         Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 1421), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Beer", 40)}), true, null, null);
         Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 0, 0, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
         Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, null, null);
         Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, null);
         Npc Hobbo = new Npc("Kevin", NpcType.HUMAN, new Stats(10, 0, 0, 0), new Inventory(), false, null, null);
-        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, null);
         Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(), true, null, null);
         Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, null);
         Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, null);
-        Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, null, null);
-        Npc Guards = new Npc("Guard", NpcType.HUMAN, new Stats(300, 0, 0, 250), new Inventory(), false, null, null);
-        Npc King = new Npc("Crazy king Nikita", NpcType.HUMAN, new Stats(150, 0, 0, 750), new Inventory(), false, null, null);
         Npc Dwarfs = new Npc("Dwarf", NpcType.DWARF, new Stats(200, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(30, "Axe", 75)}), false, null, null);
         Npc Goblins = new Npc("Goblin", NpcType.GOBLIN, new Stats(200, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(30, "Wooden Club", 75)}), false, null, null);
         Npc Fish = new Npc("Fish", NpcType.FISH, new Stats(50, 0, 0, 0), new Inventory(), false, null, null);
         Npc Snakes = new Npc("Snake", NpcType.SNAKE, new Stats(75, 0, 0, 0), new Inventory(new List<Object>(){new Weapon(10, "Bite", 75)}), false, null, null);
-        Npc Dragon = new Npc("Dragon", NpcType.DEMON, new Stats(500, 0, 0, 0), new Inventory(new List<Object>(){new Weapon(30, "Axe", 75)}), false, null, null);
+        Npc Dragon = new Npc("Dragon", NpcType.DRAGON, new Stats(500, 0, 0, 0), new Inventory(new List<Object>(){new Weapon(30, "Axe", 75)}), false, null, null);
         // King Terry the Terrible
 
         // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
