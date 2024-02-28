@@ -247,7 +247,6 @@ class Program
         });
         ThiefDialogue.AddNode("1.2","Nah man I can't have that", new List<Option>(){
             new Option("I'm gonna need to or else", null, "1", ()=>{
-                Fight(player, Thieff);
                 ThiefDialogue.RemoveOption("1", 1);
                 ThiefDialogue.RemoveOption("1", 0);
                 ThiefDialogue.AddOption("1", new Option("No, you're a thief.", null, "1"));
@@ -294,9 +293,9 @@ class Program
 
         Dialogue FishDialogue = new Dialogue();
         Npc Fish = new Npc("Fish", NpcType.FISH, new Stats(50, 0, 0, 0), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Fish", 40)}), false, null, FishDialogue);
+        Npc Fish1 = new Npc("Fish", NpcType.FISH, new Stats(50, 0, 0, 0), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Fish", 40)}), false, null, FishDialogue);
+        Npc Fish2 = new Npc("Fish", NpcType.FISH, new Stats(50, 0, 0, 0), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Fish", 40)}), false, null, FishDialogue);
         FishDialogue.AddNode("1", "Blub, blub, splash", new List<Option>(){
-            new Option("Fight the fish.", null, "1", ()=>{
-                Fight(player, Fish);}),
             new Option("Leave the fish alone.", null, "1")
         });
 
@@ -385,9 +384,6 @@ class Program
         Dialogue guardsDialogue = new Dialogue();
         guardsDialogue.AddNode("1", "STOP! Who are you? \nYou can't just come to the treasury", new List<Option>(){
             new Option("\"I am a traveller from the farms. I'm here for the King! \nWhere can i find him?\"", "1.1"),
-            new Option("Kill the guards", null, "1", ()=>{
-                Fight(GamePlayer, Guards);
-            }),
         });
         guardsDialogue.AddNode("1.1", "Allright, the king is in his throne room.\nI'd watch out though if I were you\nHe's a bit crazy", new List<Option>(){
             new Option("Thanks", null, "1"),
@@ -472,7 +468,7 @@ class Program
         // Console.WriteLine(Mountain);
 
         // Location: Farm SubLocations: River, Woods, Farmhouse
-        SubLocation River = new SubLocation("River", new List<Npc>(){Fish});
+        SubLocation River = new SubLocation("River", new List<Npc>(){Fish, Fish1, Fish2});
         SubLocation Woods = new SubLocation("Woods", new List<Npc>(){Snakes});
         SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>(){Mother});
 
@@ -1192,6 +1188,7 @@ class Program
         bool NpcChoice()
         {
             Npc npc = GameWorld.CurrentSubLocation.Npcs[currentChoice];
+            if (npc.Stats.CurrentHealth <= 0) { return true; }
             while (true)
             {
                 Console.Clear();
