@@ -132,7 +132,7 @@ class Program
     {
 
         // barkeeper example
-        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 15), new Inventory(), true, null, null);
+        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 1500), new Inventory(), true, null, null);
         Dialogue drunkardDialogue = new Dialogue();
         drunkardDialogue.AddNode("1", "awwha whhah hahwhw whahh\nwwahahhahhhhwhah (What do you want?)", new List<Option>(){
             new Option("I can help you", "1.1"),
@@ -156,13 +156,33 @@ class Program
 
 
 
+
+
+
+
+        Dialogue shopDialogue = new Dialogue();
+        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(new List<Object>(){new Weapon(500, "fsafas", 50)}), true, null, shopDialogue);
+        shopDialogue.AddNode("1", "Welcome to my shop. Want anything?", new List<Option>(){
+            new Option("Yes", null, "1", ()=>{
+                Trade(player, Shopkeeper);
+            }),
+            new Option("Got any quests?", null, "1", ()=>{
+                player.AddQuest(
+                    new Quest("a", QuestType.FETCH, ItemType.USABLE, "Beer", Shopkeeper)
+                );
+            }),
+        });
+
+
+
+        
+
         Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 1421), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Beer", 40)}), true, null, null);
         Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 0, 0, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
         Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, null, null);
         Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, null);
         Npc Hobbo = new Npc("Kevin", NpcType.HUMAN, new Stats(10, 0, 0, 0), new Inventory(), false, null, null);
         Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, null);
-        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(), true, null, null);
         Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, null);
         Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, null);
         Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, null, null);
@@ -643,27 +663,28 @@ class Program
                 }
                 if (key == ConsoleKey.Enter)
                 {
-                    if (!sell && player.Inventory.Items.Count < 10 && player.Stats.Pay(npc.Inventory.GetValue(currentChoice)))
+                    if (!sell && player.Inventory.Items.Count < 10 && player.Stats.Pay(npc.Inventory.GetValue(currentChoice)) && npc.Inventory.Items.Count > 0)
                     {
                         // buy from npc
                         // could add logic here to increase the price its sold for
                         player.Inventory.Add(npc.Inventory.Items[currentChoice]);
                         npc.Inventory.Sell(currentChoice, npc.Stats);
                         GameAudio.PlayRandomDrop();
-                        currentChoice -= 1;
+                        currentChoice = 0;
                         if (npc.Inventory.Items.Count == 0)
                         {
                             currentChoice = 0;
                             sell = true;
                         }
                     }
-                    else if (sell && npc.Inventory.Items.Count < 10 && npc.Stats.Pay(player.Inventory.GetValue(currentChoice)))
+                    else if (sell && npc.Inventory.Items.Count < 10 && npc.Stats.Pay(player.Inventory.GetValue(currentChoice)) && player.Inventory.Items.Count > 0)
                     {
                         // sell to npc
                         // could add logic to decrease the price its sold for to the npc like some npc's are scammers and some are generous or something
                         npc.Inventory.Add(player.Inventory.Items[currentChoice]);
                         player.Inventory.Sell(currentChoice, player.Stats);
                         GameAudio.PlayRandomDrop();
+                        currentChoice = 0;
                         if (player.Inventory.Items.Count == 0)
                         {
                             currentChoice = 0;
