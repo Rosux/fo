@@ -4,24 +4,38 @@ using System.Threading;
 
 class Program
 {
-    static Player GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "bruh", 50), new Weapon(20, "Standard sword", 35) }));
+    static Player GamePlayer = new Player();
     static World GameWorld = InitializeWorld(GamePlayer);
     static Audio GameAudio = new Audio();
     static void Main(string[] args)
     {
-        CreateNpc();
         Console.Title = "FO (GOTY Edition)";
         Console.CursorVisible = false;
-        WriteLogo();
-        Console.WriteLine("Press ENTER to start.");
         ConsoleKey key;
         do
         {
+            WriteLogo();
+            Console.WriteLine("Press ENTER to start a new game.\nPress H for help.\nPress ESC to exit the game.");
             key = Console.ReadKey(true).Key;
-        } while (key != ConsoleKey.Enter);
-
-        Travel(GamePlayer);
-        Talk(GameWorld.CurrentSubLocation.Npcs[0]);
+            if (key == ConsoleKey.Escape)
+            {
+                return;
+            }
+            if (key == ConsoleKey.H)
+            {
+                // print help menu text stuff
+                Console.Clear();
+                WriteParchment("Fo is a game about stories\n\nYou can travel around and interact with people.\n");
+                Console.Write("\n\nPress any key to go back.");
+                Console.ReadKey();
+            }
+            if (key == ConsoleKey.Enter)
+            {
+                GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "bruh", 50), new Weapon(20, "Standard sword", 35) }));
+                GameWorld = InitializeWorld(GamePlayer);
+                MainGameplayLoop();
+            }
+        } while (true);
         
     }
 
@@ -36,6 +50,7 @@ class Program
             int longestSubLocationString = (GameWorld.GetLongestSubLocation(GameWorld.Locations[currentLocationChoice]) > 9) ? GameWorld.GetLongestSubLocation(GameWorld.Locations[currentLocationChoice]) : 9;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("     _   _   _           _                      /)_\n|\\  (_) (_) (_)         (_) /|-----------------/  o\\__\n|_\\__|___|___|___________|_/_|    ____________/ \\ ____)\n \\                          /    /             \\ /\n  \\   ___            ___   /    / / _________   |\n   \\_/___\\__________/___\\_/    /_/| | |     | | |\n     \\___/          \\___/         |_|_|     |_|_|\n");
             Console.Write($"Current location: {GameWorld.CurrentSubLocation.Name} in {GameWorld.CurrentLocation.Name}\nYour gold: {player.Stats.Gold}\n\n");
             // write the travel choice menu thing
             Console.Write($"┌─Locations{new string('─', Math.Max(0, longestLocationString-9))}─┬─Price─┐ -> ┌─Locations{new string('─', Math.Max(0, longestSubLocationString-9))}─┐\n");
@@ -98,6 +113,7 @@ class Program
                     {
                         GameWorld.TravelToLocation(GameWorld.Locations[currentLocationChoice]);
                         GameWorld.TravelToSubLocation(GameWorld.Locations[currentLocationChoice].SubLocations[currentSubLocationChoice]);
+                        GameAudio.PlayRandomCoin();
                         return;
                     }
                 }
@@ -111,28 +127,11 @@ class Program
         }
     }
 
-    private static List<Npc> CreateNpc()
-    {
-        // create peter
-        Dialogue peterDialogue = new Dialogue();
-        peterDialogue.AddNode("1", "Hey! I'm peter griffin.\nHihihi.", new List<Option>(){
-            new Option("Hi peter...\nhow are u?", "1.1"),
-            new Option("Not true!", "1.2"),
-        });
-        peterDialogue.AddNode("1.1", "Bye.", new List<Option>(){
-            new Option("...", null, "1")
-        });
-        peterDialogue.AddNode("1.2", "It's true, I am really peter griffin.", new List<Option>(){
-            new Option("...", null, "1")
-        });
-        return new List<Npc>(){new Npc("Peter Griffin", NpcType.HUMAN, new Stats(), new Inventory(), false, new List<Quest>(), peterDialogue)};
-    }
-
     private static World InitializeWorld(Player player)
     {
 
         // barkeeper example
-        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 15), new Inventory(), true, null, null);
+        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 1500), new Inventory(), true, null, null);
         Dialogue drunkardDialogue = new Dialogue();
         drunkardDialogue.AddNode("1", "awwha whhah hahwhw whahh\nwwahahhahhhhwhah (What do you want?)", new List<Option>(){
             new Option("I can help you", "1.1"),
@@ -141,11 +140,20 @@ class Program
         drunkardDialogue.AddNode("1.1", "whahh ahwhhwh whhahhah\nhwhha ha (Can you get me some beer?\nFrom the cave dwarfs.)", new List<Option>(){
             new Option("Sure", "1.1.1", null, ()=>{
                 player.AddQuest(
-                    new Quest("Fetch a beer and deliver it to the drunkard.", QuestType.FETCH, ItemType.USABLE, "Beer", drunkard, null)
+                    new Quest("Fetch a beer and deliver it to the drunkard.", QuestType.FETCH, ItemType.USABLE, "Beer", drunkard, ()=>{
+                        Console.WriteLine("YWYW COMPLETED QUESTS");
+                    })
                 );
                 drunkardDialogue.RemoveOption("1", 0);
+                drunkardDialogue.AddOption("1", new Option("I gave you that beer.", "1.2"));
             }),
             new Option("No", null, "1"),
+        });
+
+        drunkardDialogue.AddNode("1.2", "hwahhahw hawhh\nwahh awhhhha whh\nawh (Thanks I needed that)", new List<Option>(){
+            new Option("...", null, "1", ()=>{
+                drunkardDialogue.RemoveOption("1", 1);
+            }),
         });
         
         drunkardDialogue.AddNode("1.1.1", "ahwha whahawhwu awuhwah uuhwa\nahhhhwhah (Thanks)", new List<Option>(){
@@ -156,13 +164,33 @@ class Program
 
 
 
+
+
+
+
+        Dialogue shopDialogue = new Dialogue();
+        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(new List<Object>(){new Weapon(500, "fsafas", 50)}), true, null, shopDialogue);
+        shopDialogue.AddNode("1", "Welcome to my shop. Want anything?", new List<Option>(){
+            new Option("Yes", null, "1", ()=>{
+                Trade(player, Shopkeeper);
+            }),
+            new Option("Got any quests?", null, "1", ()=>{
+                player.AddQuest(
+                    new Quest("a", QuestType.FETCH, ItemType.USABLE, "Beer", Shopkeeper)
+                );
+            }),
+        });
+
+
+
+        
+
         Npc Barkeeper = new Npc("Barry", NpcType.HUMAN, new Stats(200, 0, 0, 1421), new Inventory(new List<object>(){new Usable(UseType.HEAL, 15, "Beer", 40)}), true, null, null);
         Npc badNpc = new Npc("Bob", NpcType.HUMAN, new Stats(100, 0, 0, 500), new Inventory(new List<Object>(){new Weapon(20, "Standard sword", 35)}), false);
         Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, null, null);
         Npc Bird = new Npc("Peter Griffin", NpcType.BIRD, new Stats(500, 0, 0, 0), new Inventory(), false, null, null);
         Npc Hobbo = new Npc("Kevin", NpcType.HUMAN, new Stats(10, 0, 0, 0), new Inventory(), false, null, null);
         Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, null);
-        Npc Shopkeeper = new Npc("Mort", NpcType.HUMAN, new Stats(300, 0, 0, 5000), new Inventory(), true, null, null);
         Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, null);
         Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, null);
         Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, null, null);
@@ -293,7 +321,7 @@ class Program
         printingLoop();
     }
 
-    static void Fight(Player player, Npc npc)
+    static bool Fight(Player player, Npc npc)
     {
         int RollDice()
         {
@@ -316,13 +344,13 @@ class Program
             return roll;
         }
 
-        if (!npc.CanFight) { return; }
+        if (!npc.CanFight) { return true; }
         if (player.Inventory.GetWeaponDamage() <= 0)
         {
             Console.Clear();
             Console.WriteLine("You do not have a weapon to fight...\n\nPress any key to continue.");
             Console.ReadKey(true);
-            return;
+            return true;
         }
         int currentChoice = 0;
         Random r = new Random();
@@ -474,6 +502,7 @@ class Program
             Console.Write("\nPress any key to continue...\n");
             Console.ReadKey(true);
             Environment.Exit(0);
+            return false;
         }
         else if (npc.Stats.CurrentHealth <= 0)
         {
@@ -497,29 +526,32 @@ class Program
                     }
                 }
             }
+            GameWorld.CurrentSubLocation.Npcs.Remove(npc);
             Console.Write($"You killed {npc.Name}!!!\nPress any key to continue looting...\n");
             Console.ReadKey(true);
             Loot(player, npc);
+            return true;
         }
         else if (player.Stats.CurrentHealth <= 0)
         {
             // npc won
             Console.Clear();
             WriteParchment($"You died!\n\n{npc.Name} lived happily ever after.\nThey even got a medal for their bravery.\n\nLet their name be known\n{npc.Name.ToUpper()}!!! {npc.Name.ToUpper()}!!! {npc.Name.ToUpper()}!!!\n");
-            Console.Write("\nPress any key to continue...\n");
+            Console.Write("\nPress any key to continue to main menu...\n");
             Console.ReadKey(true);
-            Environment.Exit(0);
+            return false;
         }
+        return true;
     }
 
-    static List<Usable> UseItem(Player player)
+    static List<Usable> UseItem(Player player, bool heal=false)
     {
         int currentChoice = 0;
         int longestPlayerString = (player.Inventory.GetLongestName() > 12) ? player.Inventory.GetLongestName() : 12;
         ConsoleKey key;
         while (true){
             Console.Clear();
-            Console.Write($"Select your item:\n┌─Your Usables{new string('─', Math.Max(0, longestPlayerString-12))}─┬─Amount─┐\n");
+            Console.Write($"Current health: {player.Stats.CurrentHealth}/{player.Stats.MaxHealth}\n\nSelect your item:\n┌─Your Usables{new string('─', Math.Max(0, longestPlayerString-12))}─┬─Amount─┐\n");
             List<Usable> items = player.Inventory.GetHealingUsables();
             for (int i = 0; i < items.Count; i++)
             {
@@ -547,13 +579,23 @@ class Program
                 }
                 else if (key == ConsoleKey.Enter)
                 {
-                    return new List<Usable>(){items[currentChoice]};
+                    if (items.Count > 0){
+                        if (heal)
+                        {
+                            player.Stats.Heal(items[currentChoice].Amount);
+                            player.Inventory.Remove(items[currentChoice]);
+                        }else{
+                            return new List<Usable>(){items[currentChoice]};
+                        }
+                    }else{
+                        return new List<Usable>();
+                    }
                 }
                 else if (key == ConsoleKey.Escape)
                 {
                     return new List<Usable>();
                 }
-                currentChoice = Math.Clamp(currentChoice, 0, items.Count-1);
+                currentChoice = Math.Clamp(currentChoice, 0, Math.Max(0, items.Count-1));
             } while (key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow && key != ConsoleKey.Enter && key != ConsoleKey.Escape);
         }
         return new List<Usable>();
@@ -564,12 +606,12 @@ class Program
         if (!npc.CanTrade) { return; }
         int currentChoice = 0;
         bool sell = true;
-        int longestPlayerString = (player.Name.Length > player.Inventory.GetLongestName()) ? player.Name.Length : player.Inventory.GetLongestName();
-        int longestNpcString = (npc.Name.Length+8 > npc.Inventory.GetLongestName()) ? npc.Name.Length+8 : npc.Inventory.GetLongestName();
 
         // write loop
         while (true)
         {
+            int longestPlayerString = (10 > player.Inventory.GetLongestName()) ? 10 : player.Inventory.GetLongestName();
+            int longestNpcString = (npc.Name.Length+8 > npc.Inventory.GetLongestName()) ? npc.Name.Length+8 : npc.Inventory.GetLongestName();
             Console.Clear();
             string arrow = (sell) ? "->" : "<-";
 
@@ -588,13 +630,13 @@ class Program
                     // write the name of the player item
                     Console.Write("│ ");
                     if (sell && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
-                    Console.Write($"{playerItemName}{new string(' ', longestPlayerString-playerItemName.Length)} │ {playerItemValue,4}");
+                    Console.Write($"{playerItemName}{new string(' ', Math.Max(0, longestPlayerString-playerItemName.Length))} │ {playerItemValue,4}");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" │    ");
                 } else if (i == player.Inventory.Items.Count) {
-                    Console.Write($"└─{new string('─', longestPlayerString)}─┴──────┘    ");
+                    Console.Write($"└─{new string('─', Math.Max(0, longestPlayerString))}─┴──────┘    ");
                 } else {
-                    Console.Write($"{new string(' ', longestPlayerString+11)}    ");
+                    Console.Write($"{new string(' ', Math.Max(0, longestPlayerString+11))}    ");
                 }
                 // print npc items
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -603,11 +645,11 @@ class Program
                     int npcItemValue = npc.Inventory.GetValue(i);
                     Console.Write("│ ");
                     if (!sell && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
-                    Console.Write($"{npcItemName}{new string(' ', longestNpcString-npcItemName.Length)} │ {npcItemValue,4}");
+                    Console.Write($"{npcItemName}{new string(' ', Math.Max(0, longestNpcString-npcItemName.Length))} │ {npcItemValue,4}");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" │\n");
                 } else if (i == npc.Inventory.Items.Count) {
-                    Console.Write($"└─{new string('─', longestNpcString)}─┴──────┘\n");
+                    Console.Write($"└─{new string('─', Math.Max(0, longestNpcString))}─┴──────┘\n");
                 } else {
                     Console.Write("\n");
                 }
@@ -643,27 +685,28 @@ class Program
                 }
                 if (key == ConsoleKey.Enter)
                 {
-                    if (!sell && player.Inventory.Items.Count < 10 && player.Stats.Pay(npc.Inventory.GetValue(currentChoice)))
+                    if (!sell && player.Inventory.Items.Count < 10 && player.Stats.Pay(npc.Inventory.GetValue(currentChoice)) && npc.Inventory.Items.Count > 0)
                     {
                         // buy from npc
                         // could add logic here to increase the price its sold for
                         player.Inventory.Add(npc.Inventory.Items[currentChoice]);
                         npc.Inventory.Sell(currentChoice, npc.Stats);
                         GameAudio.PlayRandomDrop();
-                        currentChoice -= 1;
+                        currentChoice = 0;
                         if (npc.Inventory.Items.Count == 0)
                         {
                             currentChoice = 0;
                             sell = true;
                         }
                     }
-                    else if (sell && npc.Inventory.Items.Count < 10 && npc.Stats.Pay(player.Inventory.GetValue(currentChoice)))
+                    else if (sell && npc.Inventory.Items.Count < 10 && npc.Stats.Pay(player.Inventory.GetValue(currentChoice)) && player.Inventory.Items.Count > 0)
                     {
                         // sell to npc
                         // could add logic to decrease the price its sold for to the npc like some npc's are scammers and some are generous or something
                         npc.Inventory.Add(player.Inventory.Items[currentChoice]);
                         player.Inventory.Sell(currentChoice, player.Stats);
                         GameAudio.PlayRandomDrop();
+                        currentChoice = 0;
                         if (player.Inventory.Items.Count == 0)
                         {
                             currentChoice = 0;
@@ -698,7 +741,7 @@ class Program
     {
         int currentChoice = 0;
         bool drop = true;
-        int longestPlayerString = (player.Name.Length > player.Inventory.GetLongestName()) ? player.Name.Length : player.Inventory.GetLongestName();
+        int longestPlayerString = (10 > player.Inventory.GetLongestName()) ? 10 : player.Inventory.GetLongestName();
         int longestNpcString = (npc.Name.Length+8 > npc.Inventory.GetLongestName()) ? npc.Name.Length+8 : npc.Inventory.GetLongestName();
 
         // write loop
@@ -857,7 +900,245 @@ class Program
         }
         Console.Write($"   |  ,{new string('-', maxLength)}----,\n   \\_/_{new string('_', maxLength)}___/ \n");
     }
+
+    private static void MainGameplayLoop()
+    {
+        int currentChoice = 0;
+        int currentNpcChoice = 0;
+
+        void ShowQuests()
+        {
+            int longestQuestName = 6;
+            for (int i = 0; i < GamePlayer.OngoingQuests.Count; i++)
+            {
+                if (GamePlayer.OngoingQuests[i].Name.Length > longestQuestName){ longestQuestName = GamePlayer.OngoingQuests[i].Name.Length; }
+            }
+            
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"┌─Quests{new string('─', Math.Max(0, longestQuestName-6))}─┬─Progress─┐\n");
+            for (int i = 0; i < GamePlayer.OngoingQuests.Count; i++)
+            {
+                Quest q = GamePlayer.OngoingQuests[i];
+                string progress = "";
+                if (q.QuestType == QuestType.KILL){
+                    progress = $"{new string(' ', Math.Max(0, 8-(q.CurrentKills.ToString()+'/'+q.RequiredKillAmount.ToString()).Length))}{q.CurrentKills}/{q.RequiredKillAmount}";
+                }else if (q.QuestType == QuestType.FETCH){
+                    progress = "     0/1";
+                }
+                Console.Write("│ ");
+                Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                Console.Write($"{q.Name}{new string(' ', Math.Max(0, longestQuestName-q.Name.Length))} │ {progress}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write(" │\n");
+            }
+            Console.Write($"└─{new string('─', longestQuestName)}─┴──────────┘");
+            Console.Write("\nEnter/ESC = Go back");
+            
+            ConsoleKey key;
+            do
+            {
+                key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Escape || key == ConsoleKey.Enter)
+                {
+                    return;
+                }
+            } while (key != ConsoleKey.Escape && key != ConsoleKey.Enter);
+        }
+
+        bool NpcChoice()
+        {
+            Npc npc = GameWorld.CurrentSubLocation.Npcs[currentChoice];
+            while (true)
+            {
+                Console.Clear();
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"Selected {npc.Type.ToString().First()+npc.Type.ToString().ToLower().Substring(1)} {npc.Name}\n\n┌─Actions─┐\n");
+                if (npc.CanTalk)
+                {
+                    Console.Write("│ ");
+                    Console.BackgroundColor = (currentNpcChoice == 0) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">Talk");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write("   │\n");
+                }
+                if (npc.CanFight)
+                {
+                    Console.Write("│ ");
+                    Console.BackgroundColor = ((npc.CanTalk && currentNpcChoice == 1) || (!npc.CanTalk && currentNpcChoice == 0)) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">Fight");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write("  │\n");
+                }
+                if (npc.CanTrade)
+                {
+                    Console.Write("│ ");
+                    Console.BackgroundColor = ((npc.CanTalk && npc.CanFight && currentNpcChoice == 2) || (!npc.CanTalk && npc.CanFight && currentNpcChoice == 1) || (!npc.CanTalk && !npc.CanFight && currentNpcChoice == 0)) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">Trade");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write("  │\n");
+                }
+                Console.Write("└─────────┘\n");
+                Console.Write("Up/Down = Move around\nEnter = Use selected action\nESC = Go back");
+
+                ConsoleKey key;
+                do
+                {
+                    key = Console.ReadKey(true).Key;
+                    if (key == ConsoleKey.UpArrow)
+                    {
+                        currentNpcChoice--;
+                    }
+                    if (key == ConsoleKey.DownArrow)
+                    {
+                        currentNpcChoice++;
+                    }
+                    if (key == ConsoleKey.Enter)
+                    {
+                        if (npc.CanTalk && npc.CanFight && npc.CanTrade){
+                            if (currentNpcChoice == 0) { Talk(npc); }
+                            if (currentNpcChoice == 1) { return Fight(GamePlayer, npc); }
+                            if (currentNpcChoice == 2) { Trade(GamePlayer, npc); }
+                        }
+                        if (!npc.CanTalk && npc.CanFight && npc.CanTrade){
+                            if (currentNpcChoice == 0) { return Fight(GamePlayer, npc); }
+                            if (currentNpcChoice == 1) { Trade(GamePlayer, npc); }
+                        }
+                        if (npc.CanTalk && !npc.CanFight && npc.CanTrade){
+                            if (currentNpcChoice == 0) { Talk(npc); }
+                            if (currentNpcChoice == 1) { Trade(GamePlayer, npc); }
+                        }
+                        if (npc.CanTalk && npc.CanFight && !npc.CanTrade){
+                            if (currentNpcChoice == 0) { Talk(npc); }
+                            if (currentNpcChoice == 1) { return Fight(GamePlayer, npc); }
+                        }
+                        if (npc.CanTalk && !npc.CanFight && !npc.CanTrade){
+                            if (currentNpcChoice == 0) { Talk(npc); }
+                        }
+                        if (!npc.CanTalk && npc.CanFight && !npc.CanTrade){
+                            if (currentNpcChoice == 0) { return Fight(GamePlayer, npc); }
+                        }
+                        if (!npc.CanTalk && !npc.CanFight && npc.CanTrade){
+                            if (currentNpcChoice == 0) { Trade(GamePlayer, npc); }
+                        }
+                        currentNpcChoice = 0;
+                    }
+                    if (key == ConsoleKey.Escape)
+                    {
+                        return true;
+                    }
+                    currentNpcChoice = Math.Clamp(currentNpcChoice, 0, ((npc.CanTalk ? 1 : 0) + (npc.CanFight ? 1 : 0) + (npc.CanTrade ? 1 : 0))-1);
+                } while (key != ConsoleKey.Enter && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow && key != ConsoleKey.Escape);
+            }
+        }
+
+        while (true){
+            int longestText = 10;
+            for (int i = 0; i < GameWorld.CurrentSubLocation.Npcs.Count; i++)
+            {
+                Npc npc = GameWorld.CurrentSubLocation.Npcs[i];
+                if (longestText < $">{npc.Type.ToString()} {npc.Name}".Length) { longestText = ('>'+npc.Type.ToString()+' '+npc.Name).Length; }
+            }
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"┌─Around You{new string('─', Math.Max(0, longestText-10))}─┐\n");
+            for (int i = 0; i < GameWorld.CurrentSubLocation.Npcs.Count+3; i++)
+            {
+                Console.BackgroundColor = ConsoleColor.Black;
+                if (i < GameWorld.CurrentSubLocation.Npcs.Count)
+                {
+                    Npc npc = GameWorld.CurrentSubLocation.Npcs[i];
+                    Console.Write("│ ");
+                    Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">{npc.Type.ToString().First()+npc.Type.ToString().ToLower().Substring(1)} {npc.Name}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($" {new string(' ', Math.Max(0, longestText-('>'+npc.Type.ToString()+' '+npc.Name).Length))}│\n");
+                }
+                if (i == GameWorld.CurrentSubLocation.Npcs.Count)
+                {
+                    Console.Write($"├─Options{new string('─', Math.Max(0, longestText-7))}─┤\n│ ");
+                    Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">Travel");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"{new string(' ', Math.Max(0, longestText-7))} │\n");
+                }
+                if (i == GameWorld.CurrentSubLocation.Npcs.Count+1)
+                {
+                    Console.Write("│ ");
+                    Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">Use Items");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"{new string(' ', Math.Max(0, longestText-10))} │\n");
+                }
+                if (i == GameWorld.CurrentSubLocation.Npcs.Count+2)
+                {
+                    Console.Write("│ ");
+                    Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.Write($">Quests");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"{new string(' ', Math.Max(0, longestText-7))} │\n");
+                }
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"└─{new string('─', Math.Max(0, longestText))}─┘\n\n");
+            Console.Write("Up/Down = Move around\nEnter = Use select");
+
+            ConsoleKey key;
+            do
+            {
+                key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.UpArrow)
+                {
+                    currentChoice--;
+                }
+                if (key == ConsoleKey.DownArrow)
+                {
+                    currentChoice++;
+                }
+                if (key == ConsoleKey.Enter)
+                {
+                    if (currentChoice >= 0 && currentChoice < GameWorld.CurrentSubLocation.Npcs.Count)
+                    {
+                        // open sub menu
+                        if (!NpcChoice())
+                        {
+                            return;
+                        }
+                    }else{
+                        if (currentChoice == GameWorld.CurrentSubLocation.Npcs.Count) {
+                            Travel(GamePlayer);
+                        } else if (currentChoice == GameWorld.CurrentSubLocation.Npcs.Count) {
+                            UseItem(GamePlayer, true);
+                        } else if (currentChoice == GameWorld.CurrentSubLocation.Npcs.Count+1) {
+                            UseItem(GamePlayer, true);
+                        } else if (currentChoice == GameWorld.CurrentSubLocation.Npcs.Count+2) {
+                            ShowQuests();
+                        }
+                    }
+                    currentChoice = 0;
+                }
+                currentChoice = Math.Clamp(currentChoice, 0, GameWorld.CurrentSubLocation.Npcs.Count+2);
+            } while (key != ConsoleKey.Enter && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow);
+        }
+
+
+        
+
+
+
+    }
 }
+
+// Your current location: Bar in Town
+// ┌─Around You──┐ -> ┌─Actions─┐
+// │ >Human John │    │ >Talk   │
+// │ >Bird Peter │    │ >Fight  │
+// │ >Bird Peter │    │ >Trade  │
+// │ >Dwarf Ork  │    └─────────┘
+// ├─Options─────┤
+// │ >Travel     │
+// │ >Use Items  │
+// └─────────────┘
 
 // Your current location: Town
 // ┌─Locations─┬─Price─┐ -> ┌─Locations─┐
@@ -906,7 +1187,7 @@ class Program
 //        _   _   _           _                      /)_
 //   |\  (_) (_) (_)         (_) /|-----------------/  o\__
 //   |_\__|___|___|___________|_/_|    ____________/ \ ____)
-//    \                          /    /    Horsey   \ /
+//    \                          /    /             \ /
 //     \   ___            ___   /    / / _________   |
 //      \_/___\__________/___\_/    /_/| | |     | | |
 //        \___/          \___/         |_|_|     |_|_|
