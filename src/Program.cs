@@ -584,12 +584,12 @@ class Program
         if (!npc.CanTrade) { return; }
         int currentChoice = 0;
         bool sell = true;
-        int longestPlayerString = (player.Name.Length > player.Inventory.GetLongestName()) ? player.Name.Length : player.Inventory.GetLongestName();
-        int longestNpcString = (npc.Name.Length+8 > npc.Inventory.GetLongestName()) ? npc.Name.Length+8 : npc.Inventory.GetLongestName();
 
         // write loop
         while (true)
         {
+            int longestPlayerString = (10 > player.Inventory.GetLongestName()) ? 10 : player.Inventory.GetLongestName();
+            int longestNpcString = (npc.Name.Length+8 > npc.Inventory.GetLongestName()) ? npc.Name.Length+8 : npc.Inventory.GetLongestName();
             Console.Clear();
             string arrow = (sell) ? "->" : "<-";
 
@@ -608,13 +608,13 @@ class Program
                     // write the name of the player item
                     Console.Write("│ ");
                     if (sell && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
-                    Console.Write($"{playerItemName}{new string(' ', longestPlayerString-playerItemName.Length)} │ {playerItemValue,4}");
+                    Console.Write($"{playerItemName}{new string(' ', Math.Max(0, longestPlayerString-playerItemName.Length))} │ {playerItemValue,4}");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" │    ");
                 } else if (i == player.Inventory.Items.Count) {
-                    Console.Write($"└─{new string('─', longestPlayerString)}─┴──────┘    ");
+                    Console.Write($"└─{new string('─', Math.Max(0, longestPlayerString))}─┴──────┘    ");
                 } else {
-                    Console.Write($"{new string(' ', longestPlayerString+11)}    ");
+                    Console.Write($"{new string(' ', Math.Max(0, longestPlayerString+11))}    ");
                 }
                 // print npc items
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -623,11 +623,11 @@ class Program
                     int npcItemValue = npc.Inventory.GetValue(i);
                     Console.Write("│ ");
                     if (!sell && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
-                    Console.Write($"{npcItemName}{new string(' ', longestNpcString-npcItemName.Length)} │ {npcItemValue,4}");
+                    Console.Write($"{npcItemName}{new string(' ', Math.Max(0, longestNpcString-npcItemName.Length))} │ {npcItemValue,4}");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" │\n");
                 } else if (i == npc.Inventory.Items.Count) {
-                    Console.Write($"└─{new string('─', longestNpcString)}─┴──────┘\n");
+                    Console.Write($"└─{new string('─', Math.Max(0, longestNpcString))}─┴──────┘\n");
                 } else {
                     Console.Write("\n");
                 }

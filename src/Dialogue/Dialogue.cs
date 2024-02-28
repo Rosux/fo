@@ -27,6 +27,7 @@ public class Dialogue
 
     public void RemoveOption(string NodeId, int optionIndex)
     {
+        if (optionIndex > this.Nodes[NodeId].Options.Count || optionIndex < 0) { return; }
         this.Nodes[NodeId].Options.RemoveAt(optionIndex);
     }
 
