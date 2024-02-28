@@ -5,5 +5,7 @@ public enum NpcType
     DWARF,
     DEMON,
     BIRD,
-    DOG
+    DOG,
+    SNAKE,
+    FISH,
 }

@@ -166,6 +166,13 @@ class Program
         Npc Thieff = new Npc("adiaq la", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), false, null, null);
         Npc Nurse = new Npc("Joy", NpcType.HUMAN, new Stats(200, 0, 0, 500), new Inventory(), true, null, null);
         Npc Patient = new Npc("Prapor", NpcType.HUMAN, new Stats(50, 0, 0, 200), new Inventory(), false, null, null);
+        Npc Guards = new Npc("Guard", NpcType.HUMAN, new Stats(300, 0, 0, 250), new Inventory(), false, null, null);
+        Npc King = new Npc("Crazy king Nikita", NpcType.HUMAN, new Stats(150, 0, 0, 750), new Inventory(), false, null, null);
+        Npc Dwarfs = new Npc("Dwarf", NpcType.DWARF, new Stats(200, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(30, "Axe", 75)}), false, null, null);
+        Npc Goblins = new Npc("Goblin", NpcType.GOBLIN, new Stats(200, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(30, "Wooden Club", 75)}), false, null, null);
+        Npc Fish = new Npc("Fish", NpcType.FISH, new Stats(50, 0, 0, 0), new Inventory(), false, null, null);
+        Npc Snakes = new Npc("Snake", NpcType.SNAKE, new Stats(75, 0, 0, 0), new Inventory(new List<Object>(){new Weapon(10, "Bite", 75)}), false, null, null);
+        Npc Dragon = new Npc("Dragon", NpcType.DEMON, new Stats(500, 0, 0, 0), new Inventory(new List<Object>(){new Weapon(30, "Axe", 75)}), false, null, null);
         // King Terry the Terrible
 
         // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
@@ -179,24 +186,24 @@ class Program
         // Console.WriteLine(Town);
 
         // Location Castle SubLocations: Treasury, Throne Room, Dungeon
-        SubLocation Treasury = new SubLocation("Treasury", new List<Npc>());
-        SubLocation Throne_Room = new SubLocation("Throne Room", new List<Npc>());
-        SubLocation Dungeon = new SubLocation("Dungeon", new List<Npc>());
+        SubLocation Treasury = new SubLocation("Treasury", new List<Npc>(){Guards});
+        SubLocation Throne_Room = new SubLocation("Throne Room", new List<Npc>(){King});
+        SubLocation Dungeon = new SubLocation("Dungeon", new List<Npc>(){Goblins});
 
         Location Castle = new Location("Castle", new List<SubLocation>{Treasury, Throne_Room, Dungeon}, 500);
         // Console.WriteLine(Castle);
 
         // Location: Mountain SubLocations: Cave, Vulcano
-        SubLocation Cave = new SubLocation("Cave", new List<Npc>());
-        SubLocation Vulcano = new SubLocation("Vulcano", new List<Npc>());
+        SubLocation Cave = new SubLocation("Cave", new List<Npc>(){Dwarfs});
+        SubLocation Vulcano = new SubLocation("Vulcano", new List<Npc>(){Dragon});
 
         Location Mountain = new Location("Mountain", new List<SubLocation>{Cave, Vulcano}, 300);
         // Console.WriteLine(Mountain);
 
         // Location: Farm SubLocations: River, Woods, Farmhouse
-        SubLocation River = new SubLocation("River", new List<Npc>());
-        SubLocation Woods = new SubLocation("Woods", new List<Npc>());
-        SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>());
+        SubLocation River = new SubLocation("River", new List<Npc>(){Fish});
+        SubLocation Woods = new SubLocation("Woods", new List<Npc>(){Snakes});
+        SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>(){Mother});
 
         Location Farm = new Location("Farm", new List<SubLocation>{River, Woods, Farmhouse}, 200);
         // Console.WriteLine(Farm);
