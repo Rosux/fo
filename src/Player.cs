@@ -4,6 +4,7 @@ public class Player
     public Inventory Inventory;
     public Stats Stats;
     public List<Quest> OngoingQuests;
+    public List<Quest> CompletedQuest;
     
 
     public Player(string Name = "Player", Stats Stats = null, Inventory Inventory = null, List<Quest> Quests = null)
