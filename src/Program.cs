@@ -31,7 +31,7 @@ class Program
             }
             if (key == ConsoleKey.Enter)
             {
-                GamePlayer = new Player("PIETER POST", new Stats(300, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "reddit moderator katana", 50), new Armor(50, "Stupid helmet", 15), new Usable(UseType.HEAL, 200, "Potion of health", 250) }));
+                GamePlayer = new Player("PIETER POST", new Stats(300, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(90, "reddit moderator katana", 50), new Armor(50, "Stupid helmet", 15), new Usable(UseType.HEAL, 200, "Potion of health", 250) }));
                 GameWorld = InitializeWorld(GamePlayer);
                 MainGameplayLoop();
             }
@@ -406,7 +406,7 @@ class Program
                 if (player.Stats.Pay(40))
                 {
                     Barkeeper.Stats.AddGold(40);
-                    GamePlayer.Inventory.Add(new Usable(UseType.HEAL, 30, "Steak", 40));
+                    GamePlayer.Inventory.Add(new Usable(UseType.HEAL, 35, "Steak", 40));
                 }
             }),
             new Option("Leave", null, "1"),
