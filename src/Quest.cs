@@ -34,6 +34,10 @@ public class Quest
 
     public void Complete(Player player)
     {
+        if (this.Callback != null)
+        {
+            this.Callback();
+        }
         player.OngoingQuests.Remove(this);
     }
 

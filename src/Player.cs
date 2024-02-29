@@ -13,6 +13,7 @@ public class Player
         this.Stats = (Stats == null) ? new Stats() : Stats;
         this.Inventory = (Inventory == null) ? new Inventory() : Inventory;
         this.OngoingQuests = (Quests == null) ? new List<Quest>() : Quests;
+        this.CompletedQuest = new List<Quest>();
     }
     public void AddQuest(Quest quest)
     {

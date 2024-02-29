@@ -31,7 +31,7 @@ class Program
             }
             if (key == ConsoleKey.Enter)
             {
-                GamePlayer = new Player("Player", new Stats(100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "bruh", 50), new Weapon(20, "Standard sword", 35) }));
+                GamePlayer = new Player("PIETER POST", new Stats(300, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(500, "reddit moderator katana", 50), new Armor(50, "Stupid helmet", 15), new Usable(UseType.HEAL, 200, "Potion of health", 250) }));
                 GameWorld = InitializeWorld(GamePlayer);
                 MainGameplayLoop();
             }
@@ -131,7 +131,7 @@ class Program
     {
 
         // drunkard example
-        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 15), new Inventory(), true, null, null);
+        Npc drunkard = new Npc("Terry", NpcType.HUMAN, new Stats(50, 0, 0, 60), new Inventory(), true, null, null);
         Dialogue drunkardDialogue = new Dialogue();
         drunkardDialogue.AddNode("1", "awwha whhah hahwhw whahh\nwwahahhahhhhwhah (What do you want?)", new List<Option>(){
             new Option("I can help you", "1.1"),
@@ -141,11 +141,10 @@ class Program
             new Option("Sure", "1.1.1", null, ()=>{
                 player.AddQuest(
                     new Quest("Fetch a beer and deliver it to the drunkard.", QuestType.FETCH, ItemType.USABLE, "Beer", drunkard, ()=>{
-                        Console.WriteLine("YWYW COMPLETED QUESTS");
+                        drunkardDialogue.AddOption("1", new Option("I gave you that beer.", "1.2"));
                     })
                 );
                 drunkardDialogue.RemoveOption("1", 0);
-                drunkardDialogue.AddOption("1", new Option("I gave you that beer.", "1.2"));
             }),
             new Option("No", null, "1"),
         });
@@ -442,35 +441,37 @@ class Program
         // Npc Dragon = new Npc("Dragon", NpcType.DEMON, new Stats(500, 0, 0, 0), new Inventory(new List<Object>(){new Weapon(30, "Axe", 75)}), false, null, null);
         // King Terry the Terrible
 
+        // LOCATIONS:
+
         // Location: Town SubLocations: Bar, Fountain, Town_Sqaure, Shop, Hospital 
-        SubLocation Bar = new SubLocation("Bar", new List<Npc>(){drunkard, Barkeeper});
-        SubLocation Fountain = new SubLocation("Fountain", new List<Npc>(){Bird, Hobbo});
-        SubLocation Town_Square = new SubLocation("Town Square", new List<Npc>(){Ronnie});
-        SubLocation Shop = new SubLocation("Shop", new List<Npc>(){Shopkeeper, Thieff});
-        SubLocation Hospital = new SubLocation("Hospital", new List<Npc>(){Nurse, Patient}); 
+        SubLocation Bar = new SubLocation("Bar", new List<Npc>(){drunkard, Barkeeper}, " _____________________\n|         |_________\n|        [___________\n|          |   |   |\n|    @@   /_\\ /_\\ /_\\\n|   @()@\n|   _/\\_\n| <&,)(V)-,_ ________\n|  ~_) ( [_________ _\n|  (_( _) |          |\n|   \\ \\~  |          |\n|    \\,\\, |          |\n|    /'/'o===========|\n|_,__-'-_,+-----------\n");
+        SubLocation Fountain = new SubLocation("Fountain", new List<Npc>(){Bird, Hobbo}, "       ('          \n      `),       \n   __cD|`.__    \n  !_________!   \n    \\_____/     \n     !___!      \n      | |       \n      | |       \n     _!_!_      \n   /_______\\    \n");
+        SubLocation Town_Square = new SubLocation("Town Square", new List<Npc>(){Ronnie}, "~         ~~          __\n       _T      .,,.    ~--~ ^^\n ^^   // \\                    ~\n      ][O]    ^^      ,-~ ~\n   /''-I_I         _II____\n__/_  /   \\ ______/ ''   /'\\_,__\n  | II--'''' \\,--:--..,_/,.-[ },\n; '/__\\,.--';|   |[] .-.| O[ _ }\n:' |  | []  -|   ''--:.;[,.'\\,/\n'  |[]|,.--'' '',   ''-,.    |\n  ..    ..-''    ;       ''. '\n");
+        SubLocation Shop = new SubLocation("Shop", new List<Npc>(){Shopkeeper, Thieff}, " __________________________________________________________________________\n|: : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : |\n| : : : : : : : : : : : : : : : :_________________________: : : : : : : : :|\n|: : : : : : : : : : : : : : : _)                         (_ : : : : : : : |\n| : : : : : : : : : : : : : : )_ :  Club 40 Gift Shoppe :  _( : : : : : : :|\n|: : Elevator  : : : :__________)_________________________(__________  : : |\n| _____________ : _ :/ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ\\: _ :|\n||  _________  | /_\\ '.Z.'.Z.'.Z.'.Z.'.Z.'.Z.'.Z.'.Z.'.Z.'.Z.'.Z.'.Z.' /_\\ |\n|| |    |    | |:=|=: |Flowers * Perfumes_________Lingerie * Candles| :=|=:|\n|| |    |    | | : : :|   ______    _  .'         '.  _    ______   |: : : |\n|| |    |    | |======| .' ,|,  '. /_\\ |           | /_\\ .'  ,|, '. |======|\n|| |    |    |:|Lounge| | ;;;;;  | =|= |           | =|= |  ;;;;; | |Casino|\n|| |    |    | |<---  | |_';;;'_n|     |  n______  |     |$_';;;'_| |  --->|\n|| |    |    | |      | |_|-;-|__|     |-|_______|-|     |__|-;-|_| |      |\n|| |    |    | |      | |________|     |           |     |________| |      |\n|| |    |    | |      |                |           |                |      |\nlc_|____|____|_|______|________________|           |________________|______|\n");
+        SubLocation Hospital = new SubLocation("Hospital", new List<Npc>(){Nurse, Patient}, "      .---------.\n _    |:: [-=-] |\n| |   |_________|\n|~|\n|_|                    ,;;;;,\n I\\  ,__ ,;;;, __,    ///\\\\\\\\\\\n I |[   / . . \\   }   / '  \\\\||\n I | ) (   _   ) (    \\_= _///\n I |[___'-. .-'___}\\___ )_\\\n I ||~/,'~~~~~,\\~~|'---((  \\\n I \\ //        \\\\ |     \\ \\ \\\n I  \\/         // |     | /-/\n I (/         (/  |     |/||\\\n I  |             |     |    |\n I  |             |     |____/\n I  :-----_o_-----:      || |\n I  | /~~|===|~~\\ |      (( |\n I  ||   |===|   ||      ||_/\n/^\\ '~   '^^^'   ''     ((__|\n");
 
         Location Town = new Location("Town", new List<SubLocation>{Bar, Fountain, Town_Square, Shop, Hospital}, 400);
         // Console.WriteLine(Town);
 
         // Location Castle SubLocations: Treasury, Throne Room, Dungeon
-        SubLocation Treasury = new SubLocation("Treasury", new List<Npc>(){Guards});
-        SubLocation Throne_Room = new SubLocation("Throne Room", new List<Npc>(){King});
-        SubLocation Dungeon = new SubLocation("Dungeon", new List<Npc>(){Goblins});
+        SubLocation Treasury = new SubLocation("Treasury", new List<Npc>(){Guards}, "|#######====================#######|\n|#(∞)*UNITED STATES OF AMERICA*(∞)#|\n|#**          /===\\   ********  **#|\n|*# [G}      | (') |             #*|\n|#*  ******  | /v\\ |    O N E    *#|\n|#(∞)         \\===/            (∞)#|\n|##=========	∞     ===========##|\n------------------------------------\n");
+        SubLocation Throne_Room = new SubLocation("Throne Room", new List<Npc>(){King}, "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢠⣤⣶⣾⣿⣿⣿⣿⣷⣶⣤⡄⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢸⣿⣿⠉⠛⠁⠈⠛⠉⣿⣿⡇⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢸⣿⣿⣇⣀⣀⣀⣀⣸⣿⣿⡇⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⢸⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⡇⠀⠀⠀⠀⠀⠀\n⢠⣤⣤⣤⣤⡄⠸⣿⣿⣿⣿⣿⣿⣿⣿⡇⢠⣤⣤⣤⣤⡄⠀⠀⠀⠀\n⠈⠉⠉⠉⠉⠁⢠⣤⣤⣤⣤⣤⣤⣤⣤⡄⠈⠉⠉⠉⠉⠁⠀⠀⠀⠀\n⠀⢸⣿⣿⡇⠘⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠃⢸⣿⣿⡇⠀⠀⠀⠀⠀\n⠀⢸⣿⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⣿⡇⠀⠀⠀⠀⠀\n⠀⢸⣿⣿⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⣿⣿⡇⠀⠀⠀⠀⠀\n⠀⢸⣿⣿⡇⠸⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠇⢸⣿⣿⡇⠀⠀⠀⠀⠀\n⠀⠈⠛⠛⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠛⠛⠁⠀⠀⠀⠀⠀\n");
+        SubLocation Dungeon = new SubLocation("Dungeon", new List<Npc>(){Goblins}, "   _________________________________________________________\n /|     -_-                                             _-  |\\\n/ |_-_- _                                         -_- _-   -| \\   \n  |                            _-  _--                      | \n  |                            ,                            |\n  |      .-'````````'.        '(`        .-'```````'-.      |\n  |    .` |           `.      `)'      .` |           `.    |          \n  |   /   |   ()        \\      U      /   |    ()       \\   |\n  |  |    |    ;         | o   T   o |    |    ;         |  |\n  |  |    |     ;        |  .  |  .  |    |    ;         |  |\n  |  |    |     ;        |   . | .   |    |    ;         |  |\n  |  |    |     ;        |    .|.    |    |    ;         |  |\n  |  |    |____;_________|     |     |    |____;_________|  |  \n  |  |   /  __ ;   -     |     !     |   /     `'() _ -  |  |\n  |  |  / __  ()        -|        -  |  /  __--      -   |  |\n  |  | /        __-- _   |   _- _ -  | /        __--_    |  |\n  |__|/__________________|___________|/__________________|__|\n /                                             _ -        lc \\\n/   -_- _ -             _- _---                       -_-  -_ \\\n");
 
         Location Castle = new Location("Castle", new List<SubLocation>{Treasury, Throne_Room, Dungeon}, 500);
         // Console.WriteLine(Castle);
 
         // Location: Mountain SubLocations: Cave, Vulcano
-        SubLocation Cave = new SubLocation("Cave", new List<Npc>(){Dwarfs});
-        SubLocation Vulcano = new SubLocation("Vulcano", new List<Npc>(){Dragon});
+        SubLocation Cave = new SubLocation("Cave", new List<Npc>(){Dwarfs}, " ********************************************************************************\n*                    /   \\              /'\\       _                              *\n*\\_..           /'.,/     \\_         .,'   \\     / \\_                            *\n*    \\         /            \\      _/       \\_  /    \\     _                     *\n*     \\__,.   /              \\    /           \\/.,   _|  _/ \\                    *\n*          \\_/                \\  /',.,''\\      \\_ \\_/  \\/    \\                   *\n*                           _  \\/   /    ',../',.\\    _/      \\                  *\n*             /           _/m\\  \\  /    |         \\  /.,/'\\   _\\                 *\n*           _/           /MMmm\\  \\_     |          \\/      \\_/  \\                *\n*          /      \\     |MMMMmm|   \\__   \\          \\_       \\   \\_              *\n*                  \\   /MMMMMMm|      \\   \\           \\       \\    \\             *\n*                   \\  |MMMMMMmm\\      \\___            \\_      \\_   \\            *\n*                    \\|MMMMMMMMmm|____.'  /\\_            \\       \\   \\_          *\n*                    /'.,___________...,,'   \\            \\   \\        \\         *\n*                   /       \\          |      \\    |__     \\   \\_       \\        *\n*                 _/        |           \\      \\_     \\     \\    \\       \\_      *\n*                /                               \\     \\     \\_   \\        \\     *\n*                                                 \\     \\      \\   \\__      \\    *\n*                                                  \\     \\_     \\     \\      \\   *\n*                                                   |      \\     \\     \\      \\  *\n*                                                    \\ms          |            \\ *\n ********************************************************************************\n");
+        SubLocation Vulcano = new SubLocation("Vulcano", new List<Npc>(){Dragon}, "              (   (( . : (    .)   ) :  )\n                (   ( :  .  :    :  )  ))\n                 ( ( ( (  .  :  . . ) )\n                  ( ( : :  :  )   )  )\n                   ( :(   .   .  ) .'\n                    '. :(   :    )\n                      (   :  . )  )\n                       ')   :   #@##\n                      #',### ' #@  #@\n                     #/ @'#~@#~/\\   #\n                   ##  @@# @##@  `..@,\n                 @#/  #@#   _##     `\\\n               @##;  `#~._.' ##@      \\_\n             .-#/           @#@#@--,_,--\\\n            / `@#@..,     .~###'         `~.\n          _/         `-.-' #@####@          \\\n       __/     &^^       ^#^##~##&&&   %     \\_\n      /       && ^^      @#^##@#%%#@&&&&  ^    \\\n    ~/         &&&    ^^^   ^^   &&&  %%% ^^^   `~._\n .-'   ^^    %%%. &&   ___^     &&   && &&   ^^     \\\n/akg ^^^ ___&&& X & && |n|   ^ ___ %____&& . ^^^^^   `~.\n         |M|       ---- .  ___.|n| /\\___\\  X\n                   |mm| X  |n|X    ||___|             \n");
 
         Location Mountain = new Location("Mountain", new List<SubLocation>{Cave, Vulcano}, 300);
         // Console.WriteLine(Mountain);
 
         // Location: Farm SubLocations: River, Woods, Farmhouse
-        SubLocation River = new SubLocation("River", new List<Npc>(){Fish, Fish1, Fish2});
-        SubLocation Woods = new SubLocation("Woods", new List<Npc>(){Snakes});
-        SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>(){Mother});
+        SubLocation River = new SubLocation("River", new List<Npc>(){Fish, Fish1, Fish2}, "                  _.._\n   _________....-~    ~-.______\n~~~                            ~~~~-----...___________..--------\n                                           |   |     |\n                                           | |   |  ||\n                                           |  |  |   |\n                                           |'. .' .`.|\n___________________________________________|0oOO0oO0o|____________\n -          -         -       -      -    / '  '. ` ` \\    -    -\n      --                  --       --   /    '  . `   ` \\    --\n---            ---          ---       /  '                \\ ---\n     ----               ----        /       ' ' .    ` `    \\  ----\n-----         -----         ----- /   '   '        `      `   \\\n     .-~~-.          ------     /          '    . `     `    `  \\\n      ( .._)-------           /  '    '      '      `\n		    --------/     '     '   '\n");
+        SubLocation Woods = new SubLocation("Woods", new List<Npc>(){Snakes}, "              v .   ._, |_  .,\n           `-._\\/  .  \\ /    |/_\n               \\\\  _\\, y | \\//\n         _\\_.___\\\\, \\\\/ -.\\||\n           `7-,--.`._||  / / ,\n           /'     `-. `./ / |/_.'\n                     |    |//\n                     |_    /\n                     |-   |\n                     |   =|\n                     |    |\n--------------------/ ,  . \\--------._\n");
+        SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>(){Mother}, "                            +&-\n                          _.-^-._    .--.\n                       .-'   _   '-. |__|\n                      /     |_|     \\|  |\n                     /               \\  |\n                    /|     _____     |\\ |\n                     |    |==|==|    |  |\n |---|---|---|---|---|    |--|--|    |  |\n |---|---|---|---|---|    |==|==|    |  |\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 
         Location Farm = new Location("Farm", new List<SubLocation>{River, Woods, Farmhouse}, 200);
         // Console.WriteLine(Farm);
@@ -757,10 +758,6 @@ class Program
                     player.OngoingQuests[i].CurrentKills++;
                     if(player.OngoingQuests[i].CheckCompletion())
                     {
-                        if (player.OngoingQuests[i].Callback != null)
-                        {
-                            player.OngoingQuests[i].Callback();
-                        }
                         player.OngoingQuests[i].Complete(player);
                     }
                 }
@@ -957,10 +954,9 @@ class Program
                             {
                                 if(player.OngoingQuests[i].CheckCompletion())
                                 {
-                                    if (player.OngoingQuests[i].Callback != null)
-                                    {
-                                        player.OngoingQuests[i].Callback();
-                                    }
+                                    // TODO: fix sometime :)
+                                    // Quest q = new Quest(player.OngoingQuests[i].Name, player.OngoingQuests[i].QuestType, player.OngoingQuests[i].ItemType, player.OngoingQuests[i].ItemName, player.OngoingQuests[i].Npc, player.OngoingQuests[i].Callback);
+                                    // player.CompletedQuest.Add(q);
                                     player.OngoingQuests[i].Complete(player);
                                 }
                             }
@@ -1147,11 +1143,16 @@ class Program
 
         void ShowQuests()
         {
+            // int longestQuestName = 9; // only if we fix CompletedQuests
             int longestQuestName = 6;
             for (int i = 0; i < GamePlayer.OngoingQuests.Count; i++)
             {
                 if (GamePlayer.OngoingQuests[i].Name.Length > longestQuestName){ longestQuestName = GamePlayer.OngoingQuests[i].Name.Length; }
             }
+            // for (int i = 0; i < GamePlayer.CompletedQuest.Count; i++)
+            // {
+            //     if (GamePlayer.CompletedQuest[i].Name.Length > longestQuestName){ longestQuestName = GamePlayer.CompletedQuest[i].Name.Length; }
+            // }
             
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
@@ -1171,7 +1172,23 @@ class Program
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write(" │\n");
             }
-            Console.Write($"└─{new string('─', longestQuestName)}─┴──────────┘");
+            // for (int i = 0; i < GamePlayer.CompletedQuest.Count; i++)
+            // {
+            //     Quest q = GamePlayer.CompletedQuest[i];
+            //     string progress = "";
+            //     if (q.QuestType == QuestType.KILL){
+            //         progress = $"{new string(' ', Math.Max(0, 8-(q.CurrentKills.ToString()+'/'+q.RequiredKillAmount.ToString()).Length))}{q.CurrentKills}/{q.RequiredKillAmount}";
+            //     }else if (q.QuestType == QuestType.FETCH){
+            //         progress = "     0/1";
+            //     }
+            //     Console.Write("│ ");
+            //     Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+            //     Console.Write($"{q.Name}{new string(' ', Math.Max(0, longestQuestName-q.Name.Length))} │ {progress}");
+            //     Console.BackgroundColor = ConsoleColor.Black;
+            //     Console.Write(" │\n");
+            // }
+            // Console.Write($"├─Completed{new string('─', Math.Max(0, longestQuestName-9))}─┼──────────┤\n");
+            Console.Write($"└─{new string('─', longestQuestName)}─┴──────────┘\n");
             Console.Write("\nEnter/ESC = Go back");
             
             ConsoleKey key;
@@ -1281,6 +1298,7 @@ class Program
             }
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"{GameWorld.CurrentSubLocation.Art}\n\n");
             Console.Write($"┌─Around You{new string('─', Math.Max(0, longestText-10))}─┐\n");
             for (int i = 0; i < GameWorld.CurrentSubLocation.Npcs.Count+3; i++)
             {
@@ -1360,12 +1378,6 @@ class Program
                 currentChoice = Math.Clamp(currentChoice, 0, GameWorld.CurrentSubLocation.Npcs.Count+2);
             } while (key != ConsoleKey.Enter && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow);
         }
-
-
-        
-
-
-
     }
 }
 
