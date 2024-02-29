@@ -162,7 +162,7 @@ class Program
         drunkard.CanTalk = true;
 
         // ronnie mcnutt
-        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), false, null, null);
+        Npc Ronnie = new Npc("Ronnie mcnutt", NpcType.HUMAN, new Stats(1, 0, 0, 50), new Inventory(new List<Object>(){new Weapon(40, "Shotgun", 200)}), true, null, null);
         Dialogue ronnieDialogue = new Dialogue();
         ronnieDialogue.AddNode("1", "What brings you 'round here, stranger? You lookin' for trouble or just lost?", new List<Option>(){
             new Option("I heard you got something for me", "1.1"),
@@ -317,7 +317,7 @@ class Program
         });
 
         Dialogue MotherDialogue = new Dialogue();
-        Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), false, null, MotherDialogue);
+        Npc Mother = new Npc("teressa", NpcType.HUMAN, new Stats(500, 0, 0, 100), new Inventory(), true, null, MotherDialogue);
         MotherDialogue.AddNode("1", "Hello my child, could you help me with something.", new List<Option>(){
             new Option("Yes, mother.", "1.1"),
             new Option("No, I don't have the time.", null, "1")
@@ -345,6 +345,7 @@ class Program
                 player.AddQuest(
                     new Quest("Deliver letter to Ronnie McNutt in Town Centre", QuestType.FETCH, ItemType.USABLE, "Letter", Ronnie, null)
                 );
+                    GamePlayer.Inventory.Add(new Usable(UseType.HEAL, 1, "Letter", 0));
                 patientDialogue.RemoveOption("1", 0);
             }),
         });
