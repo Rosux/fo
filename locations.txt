@@ -1,0 +1,66 @@
+all locations/sub-locations/npcs
+
+Town:
+    bar:
+        barkeeper
+        drunkard
+    town square:
+        preacher
+        guard
+        random kid/person
+    shop:
+        shopkeeper
+        thief
+    hospital:
+        nurse
+        patients
+        some guards (to keep in the mentally insane)
+        mentally insane patients
+    inn (sleeping place):
+        random npcs
+        random worker
+
+castle:
+    courtyard:
+        guards
+        general
+    throne room:
+        king
+        kings personal hand (he just brings food or some shit)
+    dungeon:
+        random thiefs/beggars/sick people
+        guards
+        some tied up goblin
+        executioner/torturer
+    walls:
+        bowmen
+        guards?
+    treasury:
+        guards
+        goldkeeper (has 200k gold in his inventory or something but super strong guards and he himself is super strong)
+
+mountain:
+    cave-entrance:
+        dwarfs (fighting the goblins)
+        goblins (fighting the dwarfs)
+    vulcano:
+        dragon
+    hut:
+        old witch bitch
+
+farm:
+    river:
+        fish fish and fish
+    woods:
+        ents
+        snakes
+        elves
+        dwarfs
+    farmhouse:
+        your mom
+        some thief that kills your mom once youre gone
+    fields:
+        cows
+        sheeps
+    horse stable:
+        horses

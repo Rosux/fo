@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection.Metadata;
-using System.Threading;
 
 class Program
 {
@@ -15,23 +13,23 @@ class Program
         do
         {
             WriteLogo();
-            Console.WriteLine("Press ENTER to start a new game.\nPress H for help.\nPress ESC to exit the game.");
+            Console.WriteLine("Press ENTER to start a new game.\nPress I for info about the game.\nPress ESC to exit the game.");
             key = Console.ReadKey(true).Key;
             if (key == ConsoleKey.Escape)
             {
                 return;
             }
-            if (key == ConsoleKey.H)
+            if (key == ConsoleKey.I)
             {
                 // print help menu text stuff
                 Console.Clear();
-                WriteParchment("Fo is a game about stories\n\nYou can travel around and interact with people.\n");
+                WriteParchment("Fo is a game about stories or something.\n\nYou are free to go anywhere as long\nas you pay the price.\nYou can interact with most people.\n\nGo out there and explore.\n");
                 Console.Write("\n\nPress any key to go back.");
                 Console.ReadKey();
             }
             if (key == ConsoleKey.Enter)
             {
-                GamePlayer = new Player("PIETER POST", new Stats(300, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(90, "reddit moderator katana", 50), new Armor(50, "Stupid helmet", 15), new Usable(UseType.HEAL, 200, "Potion of health", 250) }));
+                GamePlayer = new Player("Player", new Stats(1100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon(1190, "reddit moderator katana", 50), new Armor(50, "Stupid helmet", 15), new Usable(UseType.HEAL, 200, "Potion of health", 250) }));
                 GameWorld = InitializeWorld(GamePlayer);
                 MainGameplayLoop();
             }
@@ -372,7 +370,7 @@ class Program
         kingDialogue.AddNode("1.4", "Okay! Good luck soldier!", new List<Option>(){
             new Option("Continue", null, "1", ()=>{
                 player.AddQuest(
-                    new Quest("Kill the Dragon in the Volcano", QuestType.KILL, NpcType.DRAGON, 0)
+                    new Quest("Kill the Dragon in the Volcano", QuestType.KILL, NpcType.DRAGON, 1)
                 );
                 kingDialogue.RemoveOption("1.2", 0);
             }),
@@ -562,7 +560,7 @@ class Program
         printingLoop();
     }
 
-    static bool Fight(Player player, Npc npc)
+    static bool Fight(Npc npc)
     {
         int RollDice()
         {
@@ -584,7 +582,7 @@ class Program
             Thread.Sleep(500);
             return roll;
         }
-
+        Player player = GamePlayer;
         if (!npc.CanFight) { return true; }
         if (player.Inventory.GetWeaponDamage() <= 0)
         {
@@ -750,7 +748,7 @@ class Program
             // player won
             Console.Clear();
             if(npc.Type == NpcType.DOG){
-                WriteParchment($"Death Certificate\n\nToday our dearest {npc.Name} left us behind.\n\nR.I.P. {npc.Name}");
+                WriteParchment($"\nToday our dearest {npc.Name} left us behind.\n\nR.I.P. dearest {npc.Name}.");
             }
             for (int i = 0; i < player.OngoingQuests.Count; i++)
             {
@@ -759,6 +757,7 @@ class Program
                     player.OngoingQuests[i].CurrentKills++;
                     if(player.OngoingQuests[i].CheckCompletion())
                     {
+                        player.CompletedQuest.Add(player.OngoingQuests[i]);
                         player.OngoingQuests[i].Complete(player);
                     }
                 }
@@ -817,6 +816,7 @@ class Program
                 else if (key == ConsoleKey.Enter)
                 {
                     if (items.Count > 0){
+                        currentChoice = 0;
                         if (heal)
                         {
                             player.Stats.Heal(items[currentChoice].Amount);
@@ -830,6 +830,7 @@ class Program
                 }
                 else if (key == ConsoleKey.Escape)
                 {
+                    currentChoice = 0;
                     return new List<Usable>();
                 }
                 currentChoice = Math.Clamp(currentChoice, 0, Math.Max(0, items.Count-1));
@@ -1072,12 +1073,55 @@ class Program
                     else if (drop && player.Inventory.Items.Count > 0)
                     {
                         // drop
-                        player.Inventory.Remove(currentChoice);
-                        GameAudio.PlayRandomDrop();
-                        if (player.Inventory.Items.Count == 0)
-                        {
-                            currentChoice = 0;
-                            drop = false;
+                        int dropChoice = 0;
+                        bool droping = true;
+                        while(droping){
+                            int longest = 13;
+                            if (13 + player.Inventory.GetName(currentChoice).Length > longest) { longest = 13 + player.Inventory.GetName(currentChoice).Length; }
+                            Console.Clear();
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write($"┌─Drop item \"{player.Inventory.GetName(currentChoice)}\"?{new string('─', Math.Max(0, longest-13-player.Inventory.GetName(currentChoice).Length))}─┐\n│ ");
+                            if (dropChoice == 0) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+                            Console.Write($">Yes");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write($"{new string(' ', longest-4)} │\n│ ");
+                            if (dropChoice == 1) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+                            Console.Write($">No");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write($"{new string(' ', longest-3)} │\n");
+                            Console.Write($"└─{new string('─', longest)}─┘\n");
+                            ConsoleKey confirmKey;
+                            do{
+                                confirmKey = Console.ReadKey(true).Key;
+                                if (confirmKey == ConsoleKey.UpArrow)
+                                {
+                                    dropChoice--;
+                                }
+                                if (confirmKey == ConsoleKey.DownArrow)
+                                {
+                                    dropChoice++;
+                                }
+                                if (confirmKey == ConsoleKey.Enter)
+                                {
+                                    if (dropChoice == 0)
+                                    {
+                                        player.Inventory.Remove(currentChoice);
+                                        GameAudio.PlayRandomDrop();
+                                        if (player.Inventory.Items.Count == 0)
+                                        {
+                                            currentChoice = 0;
+                                            drop = false;
+                                        }
+                                        droping = false;
+                                    }
+                                    if (dropChoice == 1)
+                                    {
+                                        droping = false;
+                                        break;
+                                    }
+                                }
+                                dropChoice = Math.Clamp(dropChoice, 0, 1);
+                            } while (confirmKey != ConsoleKey.Enter && confirmKey != ConsoleKey.UpArrow && confirmKey != ConsoleKey.DownArrow);
                         }
                     }
                 }
@@ -1144,16 +1188,15 @@ class Program
 
         void ShowQuests()
         {
-            // int longestQuestName = 9; // only if we fix CompletedQuests
-            int longestQuestName = 6;
+            int longestQuestName = 9;
             for (int i = 0; i < GamePlayer.OngoingQuests.Count; i++)
             {
                 if (GamePlayer.OngoingQuests[i].Name.Length > longestQuestName){ longestQuestName = GamePlayer.OngoingQuests[i].Name.Length; }
             }
-            // for (int i = 0; i < GamePlayer.CompletedQuest.Count; i++)
-            // {
-            //     if (GamePlayer.CompletedQuest[i].Name.Length > longestQuestName){ longestQuestName = GamePlayer.CompletedQuest[i].Name.Length; }
-            // }
+            for (int i = 0; i < GamePlayer.CompletedQuest.Count; i++)
+            {
+                if (GamePlayer.CompletedQuest[i].Name.Length > longestQuestName){ longestQuestName = GamePlayer.CompletedQuest[i].Name.Length; }
+            }
             
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
@@ -1173,22 +1216,22 @@ class Program
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write(" │\n");
             }
-            // for (int i = 0; i < GamePlayer.CompletedQuest.Count; i++)
-            // {
-            //     Quest q = GamePlayer.CompletedQuest[i];
-            //     string progress = "";
-            //     if (q.QuestType == QuestType.KILL){
-            //         progress = $"{new string(' ', Math.Max(0, 8-(q.CurrentKills.ToString()+'/'+q.RequiredKillAmount.ToString()).Length))}{q.CurrentKills}/{q.RequiredKillAmount}";
-            //     }else if (q.QuestType == QuestType.FETCH){
-            //         progress = "     0/1";
-            //     }
-            //     Console.Write("│ ");
-            //     Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
-            //     Console.Write($"{q.Name}{new string(' ', Math.Max(0, longestQuestName-q.Name.Length))} │ {progress}");
-            //     Console.BackgroundColor = ConsoleColor.Black;
-            //     Console.Write(" │\n");
-            // }
-            // Console.Write($"├─Completed{new string('─', Math.Max(0, longestQuestName-9))}─┼──────────┤\n");
+            Console.Write($"├─Completed{new string('─', Math.Max(0, longestQuestName-9))}─┼──────────┤\n");
+            for (int i = 0; i < GamePlayer.CompletedQuest.Count; i++)
+            {
+                Quest q = GamePlayer.CompletedQuest[i];
+                string progress = "";
+                if (q.QuestType == QuestType.KILL){
+                    progress = $"{new string(' ', Math.Max(0, 8-(q.CurrentKills.ToString()+'/'+q.RequiredKillAmount.ToString()).Length))}{q.CurrentKills}/{q.RequiredKillAmount}";
+                }else if (q.QuestType == QuestType.FETCH){
+                    progress = "     1/1";
+                }
+                Console.Write("│ ");
+                Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                Console.Write($"{q.Name}{new string(' ', Math.Max(0, longestQuestName-q.Name.Length))} │ {progress}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write(" │\n");
+            }
             Console.Write($"└─{new string('─', longestQuestName)}─┴──────────┘\n");
             Console.Write("\nEnter/ESC = Go back");
             
@@ -1255,11 +1298,11 @@ class Program
                     {
                         if (npc.CanTalk && npc.CanFight && npc.CanTrade){
                             if (currentNpcChoice == 0) { Talk(npc); }
-                            if (currentNpcChoice == 1) { return Fight(GamePlayer, npc); }
+                            if (currentNpcChoice == 1) { return Fight(npc); }
                             if (currentNpcChoice == 2) { Trade(GamePlayer, npc); }
                         }
                         if (!npc.CanTalk && npc.CanFight && npc.CanTrade){
-                            if (currentNpcChoice == 0) { return Fight(GamePlayer, npc); }
+                            if (currentNpcChoice == 0) { return Fight(npc); }
                             if (currentNpcChoice == 1) { Trade(GamePlayer, npc); }
                         }
                         if (npc.CanTalk && !npc.CanFight && npc.CanTrade){
@@ -1268,13 +1311,13 @@ class Program
                         }
                         if (npc.CanTalk && npc.CanFight && !npc.CanTrade){
                             if (currentNpcChoice == 0) { Talk(npc); }
-                            if (currentNpcChoice == 1) { return Fight(GamePlayer, npc); }
+                            if (currentNpcChoice == 1) { return Fight(npc); }
                         }
                         if (npc.CanTalk && !npc.CanFight && !npc.CanTrade){
                             if (currentNpcChoice == 0) { Talk(npc); }
                         }
                         if (!npc.CanTalk && npc.CanFight && !npc.CanTrade){
-                            if (currentNpcChoice == 0) { return Fight(GamePlayer, npc); }
+                            if (currentNpcChoice == 0) { return Fight(npc); }
                         }
                         if (!npc.CanTalk && !npc.CanFight && npc.CanTrade){
                             if (currentNpcChoice == 0) { Trade(GamePlayer, npc); }
@@ -1291,7 +1334,7 @@ class Program
         }
 
         while (true){
-            int longestText = 10;
+            int longestText = 13;
             for (int i = 0; i < GameWorld.CurrentSubLocation.Npcs.Count; i++)
             {
                 Npc npc = GameWorld.CurrentSubLocation.Npcs[i];
@@ -1304,6 +1347,10 @@ class Program
             for (int i = 0; i < GameWorld.CurrentSubLocation.Npcs.Count+3; i++)
             {
                 Console.BackgroundColor = ConsoleColor.Black;
+                if (GameWorld.CurrentSubLocation.Npcs.Count == 0 && i == 0)
+                {
+                    Console.Write($"│ No one around{new string(' ', Math.Max(0, longestText-13))}│\n");
+                }
                 if (i < GameWorld.CurrentSubLocation.Npcs.Count)
                 {
                     Npc npc = GameWorld.CurrentSubLocation.Npcs[i];
@@ -1311,7 +1358,7 @@ class Program
                     Console.BackgroundColor = (currentChoice == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
                     Console.Write($">{npc.Type.ToString().First()+npc.Type.ToString().ToLower().Substring(1)} {npc.Name}");
                     Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write($" {new string(' ', Math.Max(0, longestText-('>'+npc.Type.ToString()+' '+npc.Name).Length))}│\n");
+                    Console.Write($" {new string(' ', Math.Max(0, longestText-('>'+npc.Type.ToString()+' '+npc.Name).Length))} │\n");
                 }
                 if (i == GameWorld.CurrentSubLocation.Npcs.Count)
                 {

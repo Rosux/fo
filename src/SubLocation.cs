@@ -10,8 +10,4 @@ public class SubLocation
         this.Npcs = Npcs;
         this.Art = art;
     }
-    public override string ToString()
-    {
-        return $"SubLocation: {Name}, NPCs: {Npcs.Count}";
-    }
 }
