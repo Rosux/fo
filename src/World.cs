@@ -22,7 +22,15 @@ public class World
 
     public void TravelToSubLocation(SubLocation destination)
     {
+        if (this.CurrentSubLocation.ExitCallback != null)
+        {
+            this.CurrentSubLocation.ExitCallback();
+        }
         this.CurrentSubLocation = destination;
+        if (this.CurrentSubLocation.EnterCallback != null)
+        {
+            this.CurrentSubLocation.EnterCallback();
+        }
     }
     
     public void PrintAllLocations()

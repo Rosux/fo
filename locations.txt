@@ -25,7 +25,7 @@ castle:
         guards
         general
     throne room:
-        king
+        crazy king (basically ordered the killing of your mom)
         kings personal hand (he just brings food or some shit)
     dungeon:
         random thiefs/beggars/sick people
@@ -38,13 +38,16 @@ castle:
     treasury:
         guards
         goldkeeper (has 200k gold in his inventory or something but super strong guards and he himself is super strong)
+    wizzard tower:
+        wizzard
+        aprentice
 
 mountain:
     cave-entrance:
         dwarfs (fighting the goblins)
         goblins (fighting the dwarfs)
     vulcano:
-        dragon
+        dragon (might be nice fighting against the king)
     hut:
         old witch bitch
 
@@ -58,7 +61,7 @@ farm:
         dwarfs
     farmhouse:
         your mom
-        some thief that kills your mom once youre gone
+        some guards (from the king) that kill your mom once youre gone
     fields:
         cows
         sheeps
