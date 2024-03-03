@@ -5,7 +5,7 @@ public class Weapon{
     public int Damage; 
     public string Name { get; set; }
     public int Worth;
-    public Weapon(int Damage, string Name, int Worth){
+    public Weapon(string Name, int Damage, int Worth){
         this.Damage = Damage;
         this.Name= Name;
         this.Worth = Worth;

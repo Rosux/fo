@@ -5,7 +5,7 @@ public class Usable{
     public string Name { get; set; }
     public int Worth;
 
-    public Usable(UseType type, int Amount, string Name, int Worth){
+    public Usable(UseType type, string Name, int Amount, int Worth){
         this.Type = ItemType.USABLE;
         this.UseType = type;
         this.Amount = Amount;

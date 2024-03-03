@@ -19,4 +19,16 @@ public class Player
     {
         this.OngoingQuests.Add(quest);
     }
+
+    public void RemoveQuestFromNpc(Npc npc)
+    {
+        for (int i = 0; i < this.OngoingQuests.Count; i++)
+        {
+            Quest q = this.OngoingQuests[i];
+            if (q.Npc == npc)
+            {
+                this.OngoingQuests.Remove(q);
+            }
+        }
+    }
 }

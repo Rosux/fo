@@ -95,7 +95,7 @@ public class Inventory
                     break;
             }
         }
-        return (new Usable(UseType.HEAL, -1, "if you see this the inventory system is broken!", 99999999), -1);
+        return (new Usable(UseType.HEAL, "if you see this the inventory system is broken!", -1, 99999999), -1);
     }
 
     public bool Add(object Item)

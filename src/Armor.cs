@@ -3,7 +3,7 @@ public class Armor{
     public int Armorstat;
     public string Name { get; set; }
     public int Worth;
-    public Armor(int Armorstat, string Name, int Worth){
+    public Armor(string Name, int Armorstat, int Worth){
         this.Type = ItemType.ARMOR;
         this.Armorstat = Armorstat;
         this.Name= Name;

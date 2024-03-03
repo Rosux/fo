@@ -9,4 +9,7 @@ public enum NpcType
     SNAKE,
     FISH,
     DRAGON,
+    GUARD,
+    KING,
+    WIZARD,
 }

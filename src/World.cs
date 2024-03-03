@@ -2,35 +2,31 @@ public class World
 {
     public List<Location> Locations; // holds the Town/Castle/Mountain/Farm
     public Location CurrentLocation;
-    public SubLocation? CurrentSubLocation;
+    public SubLocation CurrentSubLocation;
 
     public World(List<Location> Locations)
     {
         this.Locations = Locations;
     }
 
-    public bool TravelToLocation(Location destination)
+    public bool Travel(Location Ldestination, SubLocation Sdestination)
     {
-        if (Locations.Contains(destination) && !destination.Locked)
+        if (Locations.Contains(Ldestination) && !Ldestination.Locked && Ldestination.SubLocations.Contains(Sdestination))
         {
-            this.CurrentLocation = destination;
-            this.CurrentSubLocation = null;
+            this.CurrentLocation = Ldestination;
+            // run callback on sub-location if there is one before and after switching (to do the exit and enter calls)
+            if (this.CurrentSubLocation.ExitCallback != null)
+            {
+                this.CurrentSubLocation.ExitCallback(this.CurrentSubLocation);
+            }
+            this.CurrentSubLocation = Sdestination;
+            if (this.CurrentSubLocation.EnterCallback != null)
+            {
+                this.CurrentSubLocation.EnterCallback(this.CurrentSubLocation);
+            }
             return true;
         }
         return false;
-    }
-
-    public void TravelToSubLocation(SubLocation destination)
-    {
-        if (this.CurrentSubLocation.ExitCallback != null)
-        {
-            this.CurrentSubLocation.ExitCallback();
-        }
-        this.CurrentSubLocation = destination;
-        if (this.CurrentSubLocation.EnterCallback != null)
-        {
-            this.CurrentSubLocation.EnterCallback();
-        }
     }
     
     public void PrintAllLocations()
