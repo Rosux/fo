@@ -29,7 +29,7 @@ class Program
             }
             if (key == ConsoleKey.Enter)
             {
-                GamePlayer = new Player("Player", new Stats(1100, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon("reddit moderator katana", 1190, 50), new Armor("Stupid helmet", 50, 15), new Usable(UseType.HEAL, "Potion of health", 200, 250) }));
+                GamePlayer = new Player("Player", new Stats(1, 1, 1, 10000), new Inventory(new List<Object>(){new Weapon("reddit moderator katana", 1190, 50), new Armor("Stupid helmet", 50, 15), new Usable(UseType.HEAL, "Potion of health", 200, 250) }));
                 GameWorld = InitializeWorld(GamePlayer);
                 MainGameplayLoop();
             }
@@ -71,6 +71,10 @@ class Program
         // SubLocation Woods = new SubLocation("Woods", new List<Npc>(){}, "              v .   ._, |_  .,\n           `-._\\/  .  \\ /    |/_\n               \\\\  _\\, y | \\//\n         _\\_.___\\\\, \\\\/ -.\\||\n           `7-,--.`._||  / / ,\n           /'     `-. `./ / |/_.'\n                     |    |//\n                     |_    /\n                     |-   |\n                     |   =|\n                     |    |\n--------------------/ ,  . \\--------._\n");
         // SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>(){}, "                            +&-\n                          _.-^-._    .--.\n                       .-'   _   '-. |__|\n                      /     |_|     \\|  |\n                     /               \\  |\n                    /|     _____     |\\ |\n                     |    |==|==|    |  |\n |---|---|---|---|---|    |--|--|    |  |\n |---|---|---|---|---|    |==|==|    |  |\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 
+        #region town hospital
+        SubLocation hospital = new SubLocation("Hospital", new List<Npc>(), Art.Hospital, null, null);
+        #endregion
+
         #region farm house
         Dialogue guard1Dialogue = new Dialogue();
         guard1Dialogue.AddNode("1", "Oh look who it is. Just in time for me to\nend your bloodline. Take this!", new List<Option>(){
@@ -105,17 +109,33 @@ class Program
             if(!motherAlive && guardsAlive)
             {
                 Talk(guard1);
-                Fight(guard1);
+                // if player dies fighting any guard: remove guards and move player to hospital
+                if (!Fight(guard1))
+                {
+                    location.RemoveNpc("King's Guard");
+                    location.RemoveNpc("King's Guard");
+                    GameWorld.Travel("Hospital");
+                    guardsAlive = false;
+                    return;
+                }
                 Talk(guard2);
-                Fight(guard2);
+                if (!Fight(guard2))
+                {
+                    location.RemoveNpc("King's Guard");
+                    location.RemoveNpc("King's Guard");
+                    GameWorld.Travel("Hospital");
+                    guardsAlive = false;
+                    return;
+                }
                 guardsAlive = false;
             }
         }, (SubLocation location)=>{
             // when the player leaves 2 guards come and kill mother
+            if (!motherAlive) { location.Name = "Burned Down Farm House"; }
             if (motherAlive)
             {
                 motherAlive = false;
-                location.Name = "Burned Farm House";
+                location.Name = "Burning Farm House";
                 location.RemoveNpc("Mother");
                 location.AddNpc(guard1);
                 location.AddNpc(guard2);
@@ -128,7 +148,8 @@ class Program
         #endregion
 
         World w = new World(new List<Location>(){
-            new Location("Farm", new List<SubLocation>(){house, river}, 350),
+            new Location("Farm", new List<SubLocation>(){house, river}, 250),
+            new Location("Town", new List<SubLocation>(){hospital}, 350),
         });
         w.CurrentLocation = w.Locations[0];
         w.CurrentSubLocation = w.Locations[0].SubLocations[0];
@@ -314,6 +335,7 @@ class Program
             Console.Write("Rolling...\n\n");
             (int x, int y) cursorPos = Console.GetCursorPosition();
             int roll = -1;
+            GameAudio.PlayRandomDice(); 
             for (int i = 0; i < 15; i++)
             {
                 roll = Dice.Roll();
@@ -408,7 +430,7 @@ class Program
                             (Usable npcItem, int healing) = npc.Inventory.UseHealItem(npc.Stats);
                             Console.Write($"You did {totalDamage} damage to {npc.Name}!\n{npc.Name} used {npcItem.Name} for {healing} healing!\n\n");
                         }
-                        if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else { GameAudio.PlayRandomHit(); }
+                        if (player.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else { GameAudio.PlayRandomHit(); }
                     }
                     else if (currentChoice == 1) // player blocks
                     {
@@ -431,7 +453,7 @@ class Program
                             (Usable npcItem, int healing) = npc.Inventory.UseHealItem(npc.Stats);
                             Console.Write($"{npc.Name} used {npcItem.Name} for {healing} healing!\nYou blocked 0 damage!\n\n");
                         }
-                        if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else { GameAudio.PlayRandomBlock(); }
+                        if (player.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else { GameAudio.PlayRandomBlock(); }
                     }
                     else if (currentChoice == 2) // player uses item
                     {
@@ -461,7 +483,7 @@ class Program
                         }
                         player.Stats.Heal(item.Amount);
                         player.Inventory.Remove(item);
-                        if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); }
+                        if (player.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); } else if (player.Stats.CurrentHealth > 0 && npc.Stats.CurrentHealth <= 0) { GameAudio.Play(@"Assets\Audio\Hit1.wav"); } else if (npc.Stats.CurrentHealth <= 0) { GameAudio.PlayRandomDeath(); }
                     }
                     // print health and npc health
                     Console.Write($"You: {player.Stats.CurrentHealth}/{player.Stats.MaxHealth}\n");
@@ -483,7 +505,7 @@ class Program
         {
             // both died
             Console.Clear();
-            WriteParchment($"Death Certificate\n\nToday our dearest {npc.Name} left us behind.\n\nR.I.P. {npc.Name}\n\nOh and you also died. monster.\n");
+            WriteParchment($"You died!\n\n{npc.Name} died!\n");
             Console.Write("\nPress any key to continue...\n");
             Console.ReadKey(true);
             Environment.Exit(0);
@@ -518,7 +540,7 @@ class Program
         {
             // npc won
             Console.Clear();
-            WriteParchment($"You died!\n\n{npc.Name} lived happily ever after.\nThey even got a medal for their bravery.\n\nLet their name be known\n{npc.Name.ToUpper()}!!! {npc.Name.ToUpper()}!!! {npc.Name.ToUpper()}!!!\n");
+            WriteParchment($"You died!\n");
             Console.Write("\nPress any key to continue to main menu...\n");
             Console.ReadKey(true);
             return false;

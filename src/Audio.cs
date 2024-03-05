@@ -25,6 +25,9 @@ public class Audio
     private List<string> randomCoin = new List<string>(){
         @"Assets\Audio\Coin\Coin1.wav",
     };
+    private List<string> randomDice = new List<string>(){
+        @"Assets\Audio\Dice\Dice1.wav",
+    };
 
     public Audio(){
         if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)){return;} // if were not running on windows return (since we cant play audio)
@@ -44,6 +47,7 @@ public class Audio
     public void PlayRandomDrop() { this.Play(this.randomDrop[rnd.Next(this.randomDrop.Count)]); }
     public void PlayRandomHit() { this.Play(this.randomHit[rnd.Next(this.randomHit.Count)]); }
     public void PlayRandomCoin() { this.Play(this.randomCoin[rnd.Next(this.randomCoin.Count)]); }
+    public void PlayRandomDice() { this.Play(this.randomDice[rnd.Next(this.randomDice.Count)]); }
 
     public void Loop(string soundPath)
     {

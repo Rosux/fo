@@ -29,6 +29,23 @@ public class World
         return false;
     }
     
+    public bool Travel(string Sdestination)
+    {
+        for (int i = 0; i < this.Locations.Count; i++)
+        {
+            Location loco = this.Locations[i];
+            for (int j = 0; j < loco.SubLocations.Count; j++)
+            {
+                SubLocation subway = loco.SubLocations[j];
+                if (Sdestination == subway.Name)
+                {
+                    return Travel(loco, subway);
+                }
+            }
+        }
+        return false;
+    }
+    
     public void PrintAllLocations()
     {
         foreach (Location location in Locations)
