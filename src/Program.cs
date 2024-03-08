@@ -72,7 +72,22 @@ class Program
         // SubLocation Farmhouse = new SubLocation("Farmhouse", new List<Npc>(){}, "                            +&-\n                          _.-^-._    .--.\n                       .-'   _   '-. |__|\n                      /     |_|     \\|  |\n                     /               \\  |\n                    /|     _____     |\\ |\n                     |    |==|==|    |  |\n |---|---|---|---|---|    |--|--|    |  |\n |---|---|---|---|---|    |==|==|    |  |\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
 
         #region town hospital
-        SubLocation hospital = new SubLocation("Hospital", new List<Npc>(), Art.Hospital, null, null);
+        Dialogue nurseTalk = new Dialogue();
+        nurseTalk.AddNode("2", "Hey, you're finally awake. You're lucky I could\nsave you from those terrible raiders.\nI've patched you up a bit, should be all good to go.", new List<Option>(){
+            new Option("Thanks...", null, "1"),
+        });
+        nurseTalk.AddNode("1", "Yes, What is it?", new List<Option>(){
+            new Option("Nothing...", null, "1"),
+        });
+        
+        Npc nurse = new Npc("Theresa", NpcType.HUMAN, new Stats(100, 1, 1, 43), new Inventory(new List<object>(){
+            new Weapon("Needle", 24, 56),
+            new Weapon("Medical Scissors", 36, 43),
+            new Armor("Nurse Hat", 5, 11),
+            new Usable(UseType.HEAL, "Liquid Pain", -150, 300),
+            new Usable(UseType.HEAL, "Needle filled with random substance", 53, 257),
+        }), false, nurseTalk);
+        SubLocation hospital = new SubLocation("Hospital", new List<Npc>(){ nurse }, Art.Hospital, null, null);
         #endregion
 
         #region farm house
@@ -115,7 +130,10 @@ class Program
                     location.RemoveNpc("King's Guard");
                     location.RemoveNpc("King's Guard");
                     GameWorld.Travel("Hospital");
+                    GamePlayer.Stats.CurrentHealth = GamePlayer.Stats.MaxHealth;
                     guardsAlive = false;
+                    nurse.Dialogue.SetCurrentNode("2");
+                    Talk(nurse);
                     return;
                 }
                 Talk(guard2);
@@ -124,7 +142,10 @@ class Program
                     location.RemoveNpc("King's Guard");
                     location.RemoveNpc("King's Guard");
                     GameWorld.Travel("Hospital");
+                    GamePlayer.Stats.CurrentHealth = GamePlayer.Stats.MaxHealth;
                     guardsAlive = false;
+                    nurse.Dialogue.SetCurrentNode("2");
+                    Talk(nurse);
                     return;
                 }
                 guardsAlive = false;
@@ -144,7 +165,23 @@ class Program
         #endregion
 
         #region river
-        SubLocation river = new SubLocation("River", new List<Npc>(), Art.River, null, null);
+        SubLocation river = new SubLocation("River", new List<Npc>(){
+            new Npc("Rabies Infected Fish", NpcType.FISH, new Stats(10, 0, 0, 0), new Inventory(new List<Object>(){ new Usable(UseType.HEAL, "Rabbies Infected Fish", -20, -10) }), false, null),
+            new Npc("Fish", NpcType.FISH, new Stats(10, 0, 0, 0), new Inventory(new List<Object>(){ new Usable(UseType.HEAL, "Fish", 20, 15) }), false, null),
+            new Npc("Fish", NpcType.FISH, new Stats(10, 0, 0, 0), new Inventory(new List<Object>(){ new Usable(UseType.HEAL, "Fish", 20, 15) }), false, null),
+        }, Art.River, null, (SubLocation location)=>{
+            Random r = new Random();
+            // max 4 fish (i think)
+            for (int i = Math.Max(0, 4 - location.Npcs.Count); i > 0; i--)
+            {
+                // 10% change of rabies infected fish otherwise just normal fish
+                if (r.NextDouble() < 0.10) {
+                    location.AddNpc(new Npc("Rabies Infected Fish", NpcType.FISH, new Stats(10, 0, 0, 0), new Inventory(new List<Object>(){ new Usable(UseType.HEAL, "Rabbies Infected Fish", -20, -10) }), false, null));
+                } else {
+                    location.AddNpc(new Npc("Fish", NpcType.FISH, new Stats(10, 0, 0, 0), new Inventory(new List<Object>(){ new Usable(UseType.HEAL, "Fish", 20, 15) }), false, null));
+                }
+            }
+        });
         #endregion
 
         World w = new World(new List<Location>(){
@@ -508,7 +545,6 @@ class Program
             WriteParchment($"You died!\n\n{npc.Name} died!\n");
             Console.Write("\nPress any key to continue...\n");
             Console.ReadKey(true);
-            Environment.Exit(0);
             return false;
         }
         else if (npc.Stats.CurrentHealth <= 0)

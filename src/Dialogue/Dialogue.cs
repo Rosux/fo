@@ -3,6 +3,14 @@ public class Dialogue
     public Dictionary<string, Node> Nodes = new Dictionary<string, Node>();
     public Node? CurrentNode = null;
     public Dialogue(){}
+
+    public void SetCurrentNode(string Id)
+    {
+        if (this.Nodes.ContainsKey(Id))
+        {
+            this.CurrentNode = this.Nodes[Id];
+        }
+    }
     
     /// <summary>
     /// Add a node to the dialogue.
