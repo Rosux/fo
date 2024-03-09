@@ -3,5 +3,5 @@ public enum ItemType
     WEAPON,
     ARMOR,
     USABLE,
-    None,
+    SPELL,
 }

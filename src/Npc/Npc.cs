@@ -4,13 +4,14 @@ public class Npc
     public string Name;
     public Inventory Inventory;
     public Stats Stats;
-    public Dialogue? Dialogue;
+    public Dialogue Dialogue;
+    public Action? DeathCallback;
 
     public bool CanTalk = false;
     public bool CanFight = false;
     public bool CanTrade = false;
     
-    public Npc(string Name = "NPC", NpcType Type = NpcType.HUMAN, Stats Stats = null, Inventory Inventory = null, bool CanTrade = false, Dialogue Dialogue = null)
+    public Npc(string Name = "NPC", NpcType Type = NpcType.HUMAN, Stats Stats = null, Inventory Inventory = null, bool CanTrade = false, Dialogue Dialogue = null, Action DeathCallback = null)
     {
         this.Name = Name;
         this.Type = Type;
@@ -32,8 +33,9 @@ public class Npc
         }
         else
         {
-            this.Dialogue = Dialogue;
+            this.Dialogue = new Dialogue();
         }
+        this.DeathCallback = DeathCallback;
     }
 
 }

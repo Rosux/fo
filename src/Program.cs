@@ -24,6 +24,7 @@ class Program
                 // print help menu text stuff
                 Console.Clear();
                 WriteParchment("Fo is a game about stories or something.\n\nYou are free to go anywhere as long\nas you pay the price.\nYou can interact with most people.\n\nGo out there and explore.\n");
+                Console.Write("\nMinimum requirements:\nAnything as long as it has a console size of at least 20x30");
                 Console.Write("\n\nPress any key to go back.");
                 Console.ReadKey();
             }
@@ -73,11 +74,11 @@ class Program
 
         #region town hospital
         Dialogue nurseTalk = new Dialogue();
-        nurseTalk.AddNode("2", "Hey, you're finally awake. You're lucky I could\nsave you from those terrible raiders.\nI've patched you up a bit, should be all good to go.", new List<Option>(){
-            new Option("Thanks...", null, "1"),
-        });
         nurseTalk.AddNode("1", "Yes, What is it?", new List<Option>(){
             new Option("Nothing...", null, "1"),
+        });
+        nurseTalk.AddNode("2", "Hey, you're finally awake. You're lucky I could\nsave you from those terrible raiders.\nI've patched you up a bit, should be all good to go.", new List<Option>(){
+            new Option("Thanks...", null, "1"),
         });
         
         Npc nurse = new Npc("Theresa", NpcType.HUMAN, new Stats(100, 1, 1, 43), new Inventory(new List<object>(){
@@ -85,7 +86,7 @@ class Program
             new Weapon("Medical Scissors", 36, 43),
             new Armor("Nurse Hat", 5, 11),
             new Usable(UseType.HEAL, "Liquid Pain", -150, 300),
-            new Usable(UseType.HEAL, "Needle filled with random substance", 53, 257),
+            new Usable(UseType.HEAL, "Needle filled with unknown substance", 53, 257),
         }), false, nurseTalk);
         SubLocation hospital = new SubLocation("Hospital", new List<Npc>(){ nurse }, Art.Hospital, null, null);
         #endregion
@@ -132,8 +133,10 @@ class Program
                     GameWorld.Travel("Hospital");
                     GamePlayer.Stats.CurrentHealth = GamePlayer.Stats.MaxHealth;
                     guardsAlive = false;
-                    nurse.Dialogue.SetCurrentNode("2");
-                    Talk(nurse);
+                    if (nurse.Stats.CurrentHealth > 0){
+                        nurse.Dialogue.SetCurrentNode("2");
+                        Talk(nurse);
+                    }
                     return;
                 }
                 Talk(guard2);
@@ -144,8 +147,10 @@ class Program
                     GameWorld.Travel("Hospital");
                     GamePlayer.Stats.CurrentHealth = GamePlayer.Stats.MaxHealth;
                     guardsAlive = false;
-                    nurse.Dialogue.SetCurrentNode("2");
-                    Talk(nurse);
+                    if (nurse.Stats.CurrentHealth > 0){
+                        nurse.Dialogue.SetCurrentNode("2");
+                        Talk(nurse);
+                    }
                     return;
                 }
                 guardsAlive = false;
@@ -184,9 +189,36 @@ class Program
         });
         #endregion
 
+        #region Wizard Tower
+        Npc wizard = new Npc("Wizle", NpcType.WIZARD, new Stats(300, 1, 1, 231), new Inventory(), true, null);
+        Npc wizardHat = new Npc("Wizle's Hat", NpcType.HAT, new Stats(60, 1, 1, 1), new Inventory(), false, null);
+        SubLocation WizardTower = new SubLocation("Wizard's Tower", new List<Npc>(){
+            wizard,
+            wizardHat,
+        }, Art.WizardTower1, null, null);
+        wizard.DeathCallback = wizardHat.DeathCallback = ()=>{
+            if (wizard.Stats.CurrentHealth > 0 && wizardHat.Stats.CurrentHealth > 0)
+            {
+                WizardTower.Art = Art.WizardTower1;
+            }
+            else if (wizard.Stats.CurrentHealth > 0 && wizardHat.Stats.CurrentHealth <= 0)
+            {
+                WizardTower.Art = Art.WizardTower2;
+            }
+            else if (wizard.Stats.CurrentHealth <= 0 && wizardHat.Stats.CurrentHealth > 0)
+            {
+                WizardTower.Art = Art.WizardTower3;
+            }
+            else
+            {
+                WizardTower.Art = Art.WizardTower4;
+            }
+        };
+        #endregion
+
         World w = new World(new List<Location>(){
-            new Location("Farm", new List<SubLocation>(){house, river}, 250),
-            new Location("Town", new List<SubLocation>(){hospital}, 350),
+            new Location("Farm", new List<SubLocation>(){ house, river }, 250),
+            new Location("Town", new List<SubLocation>(){ hospital, WizardTower }, 350),
         });
         w.CurrentLocation = w.Locations[0];
         w.CurrentSubLocation = w.Locations[0].SubLocations[0];
@@ -545,6 +577,10 @@ class Program
             WriteParchment($"You died!\n\n{npc.Name} died!\n");
             Console.Write("\nPress any key to continue...\n");
             Console.ReadKey(true);
+            if (npc.DeathCallback != null)
+            {
+                npc.DeathCallback();
+            }
             return false;
         }
         else if (npc.Stats.CurrentHealth <= 0)
@@ -569,6 +605,10 @@ class Program
             GameWorld.CurrentSubLocation.Npcs.Remove(npc);
             Console.Write($"You killed {npc.Name}!!!\nPress any key to continue looting...\n");
             Console.ReadKey(true);
+            if (npc.DeathCallback != null)
+            {
+                npc.DeathCallback();
+            }
             Loot(player, npc);
             return true;
         }
@@ -806,7 +846,7 @@ class Program
                     // write the name of the player item
                     Console.Write("│ ");
                     if (drop && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
-                    Console.Write($"{playerItemName}{new string(' ', longestPlayerString-playerItemName.Length)} │ {playerItemValue,4}");
+                    Console.Write($"{playerItemName}{new string(' ', Math.Max(0, longestPlayerString-playerItemName.Length))} │ {playerItemValue,4}");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" │    ");
                 } else if (i == player.Inventory.Items.Count) {
@@ -821,7 +861,7 @@ class Program
                     int npcItemValue = npc.Inventory.GetValue(i);
                     Console.Write("│ ");
                     if (!drop && currentChoice == i) { Console.BackgroundColor = ConsoleColor.DarkGray; } // if current selected item is this one we change the colors
-                    Console.Write($"{npcItemName}{new string(' ', longestNpcString-npcItemName.Length)} │ {npcItemValue,4}");
+                    Console.Write($"{npcItemName}{new string(' ', Math.Max(0, longestNpcString-npcItemName.Length))} │ {npcItemValue,4}");
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" │\n");
                 } else if (i == npc.Inventory.Items.Count) {
@@ -1236,109 +1276,3 @@ class Program
         }
     }
 }
-
-// Your current location: Bar in Town
-// ┌─Around You──┐ -> ┌─Actions─┐
-// │ >Human John │    │ >Talk   │
-// │ >Bird Peter │    │ >Fight  │
-// │ >Bird Peter │    │ >Trade  │
-// │ >Dwarf Ork  │    └─────────┘
-// ├─Options─────┤
-// │ >Travel     │
-// │ >Use Items  │
-// └─────────────┘
-
-// Your current location: Town
-// ┌─Locations─┬─Price─┐ -> ┌─Locations─┐
-// │ Town      │   300 │    │ Inkeep    │
-// │ Castle    │   150 │    │ Bar       │
-// │ Mountain  │   500 │    └───────────┘
-// └───────────┴───────┘
-
-// Your Gold: 940                  John's Gold: 69420
-// ┌─Your Items────────┬─Gold─┐ <- ┌─John's Items─────┬─Gold─┐
-// │ Sword             │    1 │    │ Buying this item │    1 │
-// │ Helmet            │   13 │    │ Iron Chestplate  │   13 │
-// │ Potion of healing │   13 │    └──────────────────┴──────┘
-// └───────────────────┴──────┘
-
-//    ▄████████  ▄██████▄ \n
-//   ███    ███ ███    ███\n
-//   ███    █▀  ███    ███\n
-//  ▄███▄▄▄     ███    ███\n
-// ▀▀███▀▀▀     ███    ███\n
-//   ███        ███    ███\n
-//   ███        ███    ███\n
-//   ███         ▀██████▀ \n
-
-//       .,-,.\n
-//    _-'/   \'-_\n
-// _-'  /     \  '-_\n
-// |'--|-------|--'|\n
-// | / \       / \ |\n
-// |/   \ 666 /   \|\n
-// /     \   /     \\n
-// |------\ /------|\n
-//  '-._   |   _.-'\n
-//      '-.'.-'\n
-
-// some ending: WriteParchment("Dearest Player.\n\nThank you for playing our game!\n\nFrom,\nTeam FO");
-
-// / \------------------------, \n
-// \_,|                       | \n
-//    |  Travel to the town?  | \n
-//    |                       | \n
-//    |    >Yes        >No    | \n
-//    |  ,---------------------,\n
-//    \_/_____________________/ \n
-
-//        _   _   _           _                      /)_
-//   |\  (_) (_) (_)         (_) /|-----------------/  o\__
-//   |_\__|___|___|___________|_/_|    ____________/ \ ____)
-//    \                          /    /             \ /
-//     \   ___            ___   /    / / _________   |
-//      \_/___\__________/___\_/    /_/| | |     | | |
-//        \___/          \___/         |_|_|     |_|_|
-
-// .__        _______        __.
-//  \ ''--___/ _____ \___--'' /
-//   '-__   |  O   O  |   __-'
-//       '--|    O    |--'
-//          |  A___A  |
-//           \_______/
-
-// ┌─npc name────┐\n
-// │ npc text    │\n
-// ├─────────────┤\n
-// │ >1: option1 │\n
-// │ >1: option2 │\n
-// └─────────────┘\n
-
-//   ___________
-//  /           \
-// |   /~~!~~\   |
-// |  _       _  |
-// | |_)  |  |_) |
-// | | \. |. | . |
-// |             |
-// |   \~~!~~/   |
-// |_____________|
-
-//  ,-=-. 
-// /  +  \
-// | ~~~ |
-// |R.I.P|
-// |_____|
-
-//[ goblins ]=-  6/97
-//             ,      ,
-//            /(.-""-.)\
-//        |\  \/      \/  /|
-//        | \ / =.  .= \ / |
-//        \( \   o\/o   / )/
-//         \_, '-/  \-' ,_/
-//           /   \__/   \
-//           \ \__/\__/ /
-//         ___\ \|--|/ /___
-//       /`    \      /    `\
-//  jgs /       '----'       \
